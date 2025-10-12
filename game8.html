@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LJY_GAME-2048</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game8.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="header">
+    <h1>🔢 2048 🔢</h1>
+    <p>숫자를 합쳐서 목표 숫자를 만들어보세요!</p>
+</div>
+
+<div class="game-container">
+    <div class="score-board">
+        <div class="score-item">
+            <h3>🎯 점수</h3>
+            <div class="score-value" id="score">0</div>
+        </div>
+        <div class="score-item">
+            <h3>🥇 최고점수</h3>
+            <div class="score-value" id="highScore">0</div>
+        </div>
+        <div class="score-item">
+            <h3>🏆 목표</h3>
+            <div class="score-value" id="target">2048</div>
+        </div>
+    </div>
+
+    <div class="game-info">
+        <span id="gameInfo">난이도를 선택하고 시작하세요!</span>
+    </div>
+
+    <div class="game-area">
+        <div id="gameBoard" class="game-board"></div>
+        <div class="game-overlay" id="gameOverlay">
+            <div class="overlay-content">
+                <div class="overlay-title" id="overlayTitle">🎯 난이도 선택!</div>
+                <div class="overlay-message" id="overlayMessage">
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn" onclick="selectDifficulty('3')">
+                            <span>🟢 초급</span><br>
+                            <small>3×3, 목표: 512</small>
+                        </button>
+                        <button class="difficulty-btn" onclick="selectDifficulty('4')">
+                            <span>🟡 중급</span><br>
+                            <small>4×4, 목표: 2048</small>
+                        </button>
+                        <button class="difficulty-btn" onclick="selectDifficulty('5')">
+                            <span>🟠 고급</span><br>
+                            <small>5×5, 목표: 4096</small>
+                        </button>
+                        <button class="difficulty-btn" onclick="selectDifficulty('6')">
+                            <span>🔴 최고급</span><br>
+                            <small>6×6, 목표: 8192</small>
+                        </button>
+                        <button class="difficulty-btn" onclick="selectDifficulty('7')">
+                            <span>🟣 극한급</span><br>
+                            <small>7×7, 목표: 16384</small>
+                        </button>
+                        <button class="difficulty-btn" onclick="selectDifficulty('8')">
+                            <span>⚫ 초월급</span><br>
+                            <small>8×8, 목표: 32768</small>
+                        </button>
+                        <button class="difficulty-btn hex-mode" onclick="selectDifficulty('hex')">
+                            <span>⭐ 육각형</span><br>
+                            <small>특별 모드, 목표: 2048</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-info">
+        <div class="control-item">
+            <span class="key">↑↓←→</span>
+            <span>타일 이동</span>
+        </div>
+        <div class="control-item">
+            <span class="key">WASD</span>
+            <span>타일 이동</span>
+        </div>
+        <div class="control-item">
+            <span class="key">SPACE</span>
+            <span>게임 시작/일시정지</span>
+        </div>
+        <div class="control-item">
+            <span class="key">R</span>
+            <span>게임 리셋</span>
+        </div>
+        <div class="control-item">
+            <span class="key">H</span>
+            <span>도움말</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" onclick="startNewGame()">🚀 게임 시작</button>
+        <button class="control-btn" onclick="pauseGame()" id="pauseBtn">⏸️ 일시정지</button>
+        <button class="control-btn" onclick="resetGame()">🔄 게임 리셋</button>
+        <button class="control-btn" onclick="changeDifficulty()">⚙️ 난이도 변경</button>
+        <button class="control-btn" onclick="showHelp()">📋 도움말</button>
+        <button class="control-btn" onclick="showStats()">📊 통계 보기</button>
+        <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+    </div>
+
+    <!-- 모바일 컨트롤 -->
+    <div class="mobile-controls">
+        <div class="mobile-control-row">
+            <button class="mobile-btn" data-direction="up">↑</button>
+        </div>
+        <div class="mobile-control-row">
+            <button class="mobile-btn" data-direction="left">←</button>
+            <button class="mobile-btn" data-direction="down">↓</button>
+            <button class="mobile-btn" data-direction="right">→</button>
+        </div>
+        <!-- 육각형 모드 전용 버튼들 -->
+        <div class="hex-controls" id="hexControls" style="display: none;">
+            <div class="hex-control-row">
+                <button class="mobile-btn hex-btn" data-direction="upleft">↖</button>
+                <button class="mobile-btn hex-btn" data-direction="upright">↗</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div>이동 횟수</div>
+            <div class="stat-value" id="moveCount">0</div>
+        </div>
+        <div class="stat-item">
+            <div>최고 타일</div>
+            <div class="stat-value" id="bestTile">2</div>
+        </div>
+        <div class="stat-item">
+            <div>게임 시간</div>
+            <div class="stat-value" id="gameTime">00:00</div>
+        </div>
+    </div>
+</div>
+
+<!-- 게임 오버 모달 -->
+<div class="game-over-modal" id="gameOverModal">
+    <div class="modal-content">
+        <h2 id="modalTitle">🎉 게임 완료!</h2>
+        <p id="modalMessage">축하합니다! 목표를 달성했습니다!</p>
+        <div class="modal-score">
+            <div>최종 점수: <span id="finalScore">0</span></div>
+            <div>최고 타일: <span id="finalBestTile">2</span></div>
+            <div>이동 횟수: <span id="finalMoves">0</span></div>
+            <div>게임 시간: <span id="finalTime">00:00</span></div>
+        </div>
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="restartGame()">🔄 다시 하기</button>
+            <button class="control-btn">🏠 메인으로</button>
+        </div>
+    </div>
+</div>
+
+<!-- 도움말 모달 -->
+<div class="game-over-modal" id="helpModal">
+    <div class="modal-content help-modal">
+        <h2>📋 2048 게임 도움말</h2>
+        
+        <div class="help-section">
+            <h3>🎯 게임 목표</h3>
+            <p>같은 숫자의 타일을 합쳐서 목표 숫자를 만드는 것입니다.</p>
+            <p>목표 달성 후에도 계속 플레이할 수 있습니다.</p>
+        </div>
+        
+        <div class="help-section">
+            <h3>🎮 조작 방법</h3>
+            <div class="control-list">
+                <div class="control-row">
+                    <span class="control-key">←→↑↓ 화살표 키</span>
+                    <span>타일 이동</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">WASD 키</span>
+                    <span>타일 이동 (W:위, A:왼쪽, S:아래, D:오른쪽)</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">Q, E 키 (육각형 모드)</span>
+                    <span>대각선 이동 (Q:왼쪽위, E:오른쪽위)</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">스와이프 (모바일)</span>
+                    <span>터치 후 드래그하여 타일 이동</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">스페이스</span>
+                    <span>게임 시작/일시정지/재개</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">R</span>
+                    <span>게임 리셋</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">H</span>
+                    <span>도움말 열기</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">ESC</span>
+                    <span>메인 화면으로</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h3>📊 난이도 설정</h3>
+            <div class="difficulty-list">
+                <div class="difficulty-row">
+                    <span class="difficulty-name">🟢 초급</span>
+                    <span>3×3, 목표: 512</span>
+                </div>
+                <div class="difficulty-row">
+                    <span class="difficulty-name">🟡 중급</span>
+                    <span>4×4, 목표: 2048</span>
+                </div>
+                <div class="difficulty-row">
+                    <span class="difficulty-name">🟠 고급</span>
+                    <span>5×5, 목표: 4096</span>
+                </div>
+                <div class="difficulty-row">
+                    <span class="difficulty-name">🔴 고급</span>
+                    <span>6×6, 목표: 8192</span>
+                </div>
+                <div class="difficulty-row">
+                    <span class="difficulty-name">🟣 최고급</span>
+                    <span>7×7, 목표: 16384</span>
+                </div>
+                <div class="difficulty-row">
+                    <span class="difficulty-name">⚫ 극한</span>
+                    <span>8×8, 목표: 32768</span>
+                </div>
+                <div class="difficulty-row">
+                    <span class="difficulty-name">⭐ 육각형</span>
+                    <span>특별 모드, 목표: 2048, 6방향 이동</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h3>🎯 게임 규칙</h3>
+            <p>• 같은 숫자의 타일이 만나면 합쳐집니다</p>
+            <p>• 합쳐진 타일은 두 배가 됩니다 (2+2=4, 4+4=8...)</p>
+            <p>• 매 이동마다 새로운 타일(2 또는 4)이 나타납니다</p>
+            <p>• 더 이상 움직일 수 없으면 게임 오버입니다</p>
+        </div>
+        
+        <div class="help-section">
+            <h3>💡 전략 팁</h3>
+            <div class="tip-item">
+                <strong>모서리 전략:</strong> 큰 숫자를 한 모서리에 모으세요.
+            </div>
+            <div class="tip-item">
+                <strong>패턴 유지:</strong> 큰 타일부터 작은 타일 순으로 정렬하세요.
+            </div>
+            <div class="tip-item">
+                <strong>공간 확보:</strong> 가능한 한 빈 공간을 많이 남겨두세요.
+            </div>
+            <div class="tip-item">
+                <strong>육각형 모드:</strong> 6방향 이동을 활용해 더 다양한 전략을 사용하세요.
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeHelp()">✅ 확인</button>
+        </div>
+    </div>
+</div>
+
+<!-- 통계 모달 -->
+<div class="game-over-modal" id="statsModal">
+    <div class="modal-content stats-modal">
+        <h2>📊 게임 통계</h2>
+        
+        <div class="help-section">
+            <h3>전체 통계</h3>
+            <div class="stats-grid">
+                <div class="stat-row">
+                    <span class="stat-label">총 게임 수:</span>
+                    <span class="stat-value" id="modalTotalGames">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">승리한 게임:</span>
+                    <span class="stat-value" id="modalWonGames">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최고 점수:</span>
+                    <span class="stat-value" id="modalHighScore">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최고 타일:</span>
+                    <span class="stat-value" id="modalBestTile">2</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">평균 점수:</span>
+                    <span class="stat-value" id="modalAvgScore">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">총 플레이 시간:</span>
+                    <span class="stat-value" id="modalTotalTime">00:00:00</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h3>난이도별 최고 기록</h3>
+            
+            <div class="difficulty-stats">
+                <div class="difficulty-stat-item">
+                    <div class="difficulty-header">
+                        <span class="difficulty-emoji">🟢</span>
+                        <span class="difficulty-title">초급 (3×3)</span>
+                    </div>
+                    <div class="difficulty-record">
+                        <span class="record-label">최고 점수:</span>
+                        <span class="record-value" id="modalBest3">기록 없음</span>
+                    </div>
+                </div>
+                
+                <div class="difficulty-stat-item">
+                    <div class="difficulty-header">
+                        <span class="difficulty-emoji">🟡</span>
+                        <span class="difficulty-title">중급 (4×4)</span>
+                    </div>
+                    <div class="difficulty-record">
+                        <span class="record-label">최고 점수:</span>
+                        <span class="record-value" id="modalBest4">기록 없음</span>
+                    </div>
+                </div>
+                
+                <div class="difficulty-stat-item">
+                    <div class="difficulty-header">
+                        <span class="difficulty-emoji">🟠</span>
+                        <span class="difficulty-title">고급 (5×5)</span>
+                    </div>
+                    <div class="difficulty-record">
+                        <span class="record-label">최고 점수:</span>
+                        <span class="record-value" id="modalBest5">기록 없음</span>
+                    </div>
+                </div>
+                
+                <div class="difficulty-stat-item">
+                    <div class="difficulty-header">
+                        <span class="difficulty-emoji">🔴</span>
+                        <span class="difficulty-title">고급 (6×6)</span>
+                    </div>
+                    <div class="difficulty-record">
+                        <span class="record-label">최고 점수:</span>
+                        <span class="record-value" id="modalBest6">기록 없음</span>
+                    </div>
+                </div>
+                
+                <div class="difficulty-stat-item">
+                    <div class="difficulty-header">
+                        <span class="difficulty-emoji">🟣</span>
+                        <span class="difficulty-title">최고급 (7×7)</span>
+                    </div>
+                    <div class="difficulty-record">
+                        <span class="record-label">최고 점수:</span>
+                        <span class="record-value" id="modalBest7">기록 없음</span>
+                    </div>
+                </div>
+                
+                <div class="difficulty-stat-item">
+                    <div class="difficulty-header">
+                        <span class="difficulty-emoji">⚫</span>
+                        <span class="difficulty-title">극한 (8×8)</span>
+                    </div>
+                    <div class="difficulty-record">
+                        <span class="record-label">최고 점수:</span>
+                        <span class="record-value" id="modalBest8">기록 없음</span>
+                    </div>
+                </div>
+                
+                <div class="difficulty-stat-item">
+                    <div class="difficulty-header">
+                        <span class="difficulty-emoji">⭐</span>
+                        <span class="difficulty-title">육각형 모드</span>
+                    </div>
+                    <div class="difficulty-record">
+                        <span class="record-label">최고 점수:</span>
+                        <span class="record-value" id="modalBestHex">기록 없음</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn reset-btn" onclick="resetStats()">🗑️ 모든 기록 삭제</button>
+            <button class="control-btn" onclick="closeStats()">✅ 확인</button>
+        </div>
+        
+        <div class="warning-text">⚠️ 삭제된 기록은 복구할 수 없습니다</div>
+    </div>
+</div>
+
+<script src="js/game8.js"></script>
+</body>
+</html>

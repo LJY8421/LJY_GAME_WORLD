@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game3.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+    <title>LJY_GAME-스네이크</title>
+</head>
+<body>
+<div class="header">
+    <h1>🐍 스네이크 게임 🍎</h1>
+    <p>뱀을 조종해서 먹이를 먹고 우주 최강 뱀이 되어보세요!</p>
+</div>
+
+<div class="game-container">
+    <div class="score-board">
+        <div class="score-item">
+            <h3>🎯 점수</h3>
+            <div class="score-value" id="score">0</div>
+        </div>
+        <div class="score-item">
+            <h3>🐍 길이</h3>
+            <div class="score-value" id="snakeLength">1</div>
+        </div>
+        <div class="score-item">
+            <h3>⚡ 속도</h3>
+            <div class="score-value" id="speed">1</div>
+        </div>
+    </div>
+
+     <div class="game-info">
+        <span id="gameInfo">방향키를 눌러 시작하세요!</span>
+    </div>
+
+    <div class="game-area-wrapper">
+        <div class="game-area">
+            <canvas id="gameCanvas" width="600" height="600"></canvas>
+            <div class="game-overlay" id="gameOverlay">
+                <div class="overlay-content">
+                    <div class="overlay-title" id="overlayTitle">🎮 게임 준비!</div>
+                    <div class="overlay-message" id="overlayMessage">방향키를 눌러 뱀을 움직이세요</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile-controls" id="mobileControls">
+            <div class="mobile-btn-row">
+                <button class="mobile-btn" data-direction="up">↑</button>
+            </div>
+            <div class="mobile-btn-row">
+                <button class="mobile-btn" data-direction="left">←</button>
+                <button class="mobile-btn" data-direction="pause">⏸️</button>
+                <button class="mobile-btn" data-direction="right">→</button>
+            </div>
+            <div class="mobile-btn-row">
+                <button class="mobile-btn" data-direction="down">↓</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-info">
+        <div class="control-item">
+            <span class="key">↑↓←→</span>
+            <span>뱀 이동 / 게임 시작</span>
+        </div>
+        <div class="control-item">
+            <span class="key">WASD</span>
+            <span>대체 조작</span>
+        </div>
+        <div class="control-item">
+            <span class="key">SPACE</span>
+            <span>일시정지/재개</span>
+        </div>
+        <div class="control-item">
+            <span class="key">R</span>
+            <span>게임 재시작</span>
+        </div>
+        <div class="control-item">
+            <span class="key">H</span>
+            <span>도움말</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" onclick="startNewGame()">🚀 게임 시작</button>
+        <button class="control-btn" onclick="pauseGame()">⏸️ 일시정지</button>
+        <button class="control-btn" onclick="resetGame()">🔄 게임 리셋</button>
+        <button class="control-btn" onclick="showHelp()">📋 도움말</button>
+        <button class="control-btn" onclick="showStats()">📊 통계 보기</button>
+        <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div>최고점수</div>
+            <div class="stat-value" id="highScore">0</div>
+        </div>
+        <div class="stat-item">
+            <div>최대길이</div>
+            <div class="stat-value" id="maxLength">1</div>
+        </div>
+        <div class="stat-item">
+            <div>먹은 음식</div>
+            <div class="stat-value" id="foodEaten">0</div>
+        </div>
+    </div>
+
+<!-- 게임 오버 모달 -->
+<div class="game-over-modal" id="gameOverModal">
+    <div class="modal-content">
+        <h2 id="modalTitle">💀 게임 오버!</h2>
+        <p id="modalMessage">뱀이 벽에 부딪히거나 자신의 몸에 부딪혔습니다!</p>
+        <div class="modal-score">
+            <div>최종 점수: <span id="finalScore">0</span></div>
+            <div>뱀 길이: <span id="finalLength">1</span></div>
+            <div>먹은 음식: <span id="finalFood">0</span></div>
+        </div>
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeModal()">다시 하기</button>
+            <button class="control-btn" onclick="goHome()">메인으로</button>
+        </div>
+    </div>
+</div>
+
+<!-- 도움말 모달 -->
+<div class="game-over-modal" id="helpModal">
+    <div class="modal-content help-modal">
+        <h2>📋 스네이크 게임 완전 가이드</h2>
+        
+        <div class="help-section">
+            <h3>🎮 게임 목표</h3>
+            <p>• 뱀을 조작하여 다양한 음식을 먹고 최대한 길게 키우세요</p>
+            <p>• 벽, 장애물, 자신의 몸에 부딪히지 않도록 주의하세요</p>
+            <p>• 각 음식의 특성을 파악하여 전략적으로 플레이하세요</p>
+            <p>• 장애물을 피하면서 고득점에 도전해보세요</p>
+        </div>
+
+        <div class="help-section">
+            <h3>🕹️ 조작법</h3>
+            <div class="control-help-grid">
+                <div class="control-help-item">
+                    <span class="help-key">↑↓←→</span>
+                    <span>뱀을 상하좌우로 이동 (게임 시작)</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">W A S D</span>
+                    <span>방향키 대신 사용 가능</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">스페이스바</span>
+                    <span>게임 일시정지 및 재개</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">R키</span>
+                    <span>게임 즉시 재시작</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">H키</span>
+                    <span>도움말 창 열기</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">ESC키</span>
+                    <span>메인 메뉴로 이동</span>
+                </div>
+            </div>
+            <p><strong>중요:</strong> 뱀은 항상 앞으로 이동하며, 반대 방향으로는 즉시 돌아갈 수 없습니다</p>
+        </div>
+
+        <div class="help-section">
+            <h3>🍎 음식 종류</h3>
+            <div class="food-help-grid">
+                <div class="food-help-item">
+                    <span class="help-food">🍎</span>
+                    <div class="food-description">
+                        <strong>기본 사과</strong><br>
+                        • 점수: +10점<br>
+                        • 효과: 길이 +1<br>
+                        • 특징: 항상 존재하는 기본 음식
+                    </div>
+                </div>
+                <div class="food-help-item">
+                    <span class="help-food">🍏</span>
+                    <div class="food-description">
+                        <strong>청사과</strong><br>
+                        • 점수: +20점<br>
+                        • 효과: 길이 변화 없음, 3초간 속도 감소<br>
+                        • 특징: 5초 후 사라짐, 위험한 상황에서 유용
+                    </div>
+                </div>
+                <div class="food-help-item">
+                    <span class="help-food">🍄</span>
+                    <div class="food-description">
+                        <strong>독버섯</strong><br>
+                        • 점수: -15점<br>
+                        • 효과: 길이 +2, 1.5초간 완전 멈춤<br>
+                        • 특징: 10초 후 사라짐, 신중하게 선택
+                    </div>
+                </div>
+            </div>
+            <p><strong>출현 조건:</strong></p>
+            <p>• 길이 10 이상: 특수 음식 1개까지 (25% 확률)</p>
+            <p>• 길이 30 이상: 특수 음식 2개까지 (15% 확률)</p>
+        </div>
+
+        <div class="help-section">
+            <h3>🧱 장애물 시스템</h3>
+            <div class="obstacle-help-grid">
+                <div class="obstacle-help-item">
+                    <div class="obstacle-icon static"></div>
+                    <div class="obstacle-description">
+                        <strong>고정 장애물</strong><br>
+                        • 외형: 회색 사각형<br>
+                        • 특징: 움직이지 않는 고정형<br>
+                        • 등장: 길이 15부터<br>
+                        • 위험도: 낮음 (예측 가능)
+                    </div>
+                </div>
+                <div class="obstacle-help-item">
+                    <div class="obstacle-icon moving"></div>
+                    <div class="obstacle-description">
+                        <strong>움직이는 장애물</strong><br>
+                        • 외형: 하늘색 글로우 효과<br>
+                        • 특징: 1초마다 이동, 벽에서 방향 전환<br>
+                        • 등장: 길이 20부터<br>
+                        • 위험도: 높음 (예측 어려움)
+                    </div>
+                </div>
+            </div>
+            <p><strong>장애물 등장 규칙:</strong></p>
+            <p>• 최대 3개까지 동시 존재 가능</p>
+            <p>• 길이 25부터 추가 장애물 등장 (8% 확률)</p>
+            <p>• 길이 35부터 세 번째 장애물 등장 (5% 확률)</p>
+            <p>• 모든 장애물과 충돌하면 즉시 게임 오버</p>
+        </div>
+
+        <div class="help-section">
+            <h3>⚡ 게임 시스템</h3>
+            <p><strong>속도 증가:</strong> 음식 5개를 먹을 때마다 게임 속도가 증가합니다</p>
+            <p><strong>점수 계산:</strong> 음식별로 다른 점수, 마이너스 점수도 가능합니다</p>
+            <p><strong>기록 저장:</strong> 최고점수, 최대길이 등이 자동으로 저장됩니다</p>
+            <p><strong>전략 팁:</strong></p>
+            <p>• 독버섯은 점수는 차감되지만 빠른 성장이 가능합니다</p>
+            <p>• 청사과의 속도 감소 효과를 위험한 상황에서 활용하세요</p>
+            <p>• 장애물이 많아질수록 안전한 경로를 미리 계획하세요</p>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeHelp()">✅ 확인</button>
+        </div>
+    </div>
+</div>
+
+<!-- 통계 모달 -->
+<div class="game-over-modal" id="statsModal">
+    <div class="modal-content stats-modal">
+        <h2>📊 게임 통계</h2>
+        
+        <div class="help-section">
+            <h3>🏆 개인 기록</h3>
+            <div class="stats-grid">
+                <div class="stat-row">
+                    <span class="stat-label">최고 점수:</span>
+                    <span class="stat-value highlight" id="modalHighScore">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최대 길이:</span>
+                    <span class="stat-value highlight" id="modalMaxLength">1</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최고 속도:</span>
+                    <span class="stat-value highlight" id="modalMaxSpeed">1</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>📈 전체 통계</h3>
+            <div class="stats-grid">
+                <div class="stat-row">
+                    <span class="stat-label">총 게임 수:</span>
+                    <span class="stat-value" id="modalTotalGames">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">총 먹은 음식:</span>
+                    <span class="stat-value" id="modalTotalFood">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">총 플레이 시간:</span>
+                    <span class="stat-value" id="modalPlayTime">0분</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn reset-btn" onclick="resetStats()">🗑️ 모든 기록 삭제</button>
+            <button class="control-btn" onclick="closeStats()">✅ 확인</button>
+        </div>
+        
+        <div class="warning-text">⚠️ 삭제된 기록은 복구할 수 없습니다</div>
+    </div>
+</div>
+
+</body>
+<script src="js/game3.js"></script>
+</html>

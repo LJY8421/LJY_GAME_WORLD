@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LJY_GAME-우주선게임</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game12.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="header">
+    <h1>🚀 우주선 게임 🌌</h1>
+    <p>적 우주선을 물리치고 우주 최강이 되어보세요!</p>
+</div>
+
+<div class="game-container">
+    <div class="score-board">
+        <div class="score-item">
+            <h3>🎯 점수</h3>
+            <div class="score-value" id="score">0</div>
+        </div>
+        <div class="score-item">
+            <h3>❤️ 생명</h3>
+            <div class="score-value" id="lives">3</div>
+        </div>
+        <div class="score-item">
+            <h3>📊 레벨</h3>
+            <div class="score-value" id="level">1</div>
+        </div>
+    </div>
+
+    <div class="game-info">
+        <span id="gameInfo">스페이스바를 눌러 시작하세요!</span>
+    </div>
+
+    <div class="game-area">
+        <canvas id="gameCanvas" width="800" height="500"></canvas>
+        <div class="game-overlay" id="gameOverlay">
+            <div class="overlay-content">
+                <div class="overlay-title" id="overlayTitle">🎮 게임 준비!</div>
+                <div class="overlay-message" id="overlayMessage">스페이스바를 눌러 게임을 시작하세요</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-info">
+        <div class="control-item">
+            <span class="key">←→</span>
+            <span>우주선 이동</span>
+        </div>
+        <div class="control-item">
+            <span class="key">SPACE</span>
+            <span>레이저 발사</span>
+        </div>
+        <div class="control-item">
+            <span class="key">P</span>
+            <span>일시정지</span>
+        </div>
+        <div class="control-item">
+            <span class="key">R</span>
+            <span>게임 재시작</span>
+        </div>
+        <div class="control-item">
+            <span class="key">H</span>
+            <span>도움말</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" onclick="startGame()">🚀 게임 시작</button>
+        <button class="control-btn" onclick="pauseGame()">⏸️ 일시정지</button>
+        <button class="control-btn" onclick="resetGame()">🔄 게임 리셋</button>
+        <button class="control-btn" onclick="showHelp()">📋 도움말</button>
+        <button class="control-btn" onclick="showStats()">📊 통계 보기</button>
+        <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div>최고점수</div>
+            <div class="stat-value" id="highScore">0</div>
+        </div>
+        <div class="stat-item">
+            <div>처치한 적</div>
+            <div class="stat-value" id="enemiesKilled">0</div>
+        </div>
+        <div class="stat-item">
+            <div>연속 히트</div>
+            <div class="stat-value" id="combo">0</div>
+        </div>
+    </div>
+</div>
+
+<!-- 게임 오버 모달 -->
+<div class="game-over-modal" id="gameOverModal">
+    <div class="modal-content">
+        <h2 id="modalTitle">💥 게임 오버</h2>
+        <p id="modalMessage">모든 생명을 잃었습니다. 다시 도전해보세요!</p>
+        <div class="modal-score">
+            <div>최종 점수: <span id="finalScore">0</span></div>
+            <div>도달 레벨: <span id="finalLevel">1</span></div>
+            <div>처치한 적: <span id="finalEnemies">0</span></div>
+        </div>
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeModal()">다시 하기</button>
+            <button class="control-btn" onclick="goHome()">메인으로</button>
+        </div>
+    </div>
+</div>
+
+<!-- 도움말 모달 -->
+<div class="game-over-modal" id="helpModal">
+    <div class="modal-content help-modal">
+        <h2>📋 우주선 게임 도움말</h2>
+        
+        <div class="help-section">
+            <h3>🎮 조작 방법</h3>
+            <div class="control-list">
+                <div class="control-row">
+                    <span class="control-key">←→ 화살표 키</span>
+                    <span>우주선 좌우 이동</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">스페이스바</span>
+                    <span>레이저 발사 / 게임 시작 / 보스전 시작</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">P키</span>
+                    <span>게임 일시정지/재개</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">R키</span>
+                    <span>게임 재시작</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">H키</span>
+                    <span>도움말 열기</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">ESC키</span>
+                    <span>메인으로 돌아가기</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>👾 적 우주선 종류</h3>
+            <div class="enemy-list">
+                <div class="enemy-item normal">
+                    <span class="enemy-color">초록색</span>
+                    <div class="enemy-info">
+                        <div class="enemy-name">일반 적</div>
+                        <div class="enemy-details">10점 | 체력 1 | 느린 속도</div>
+                    </div>
+                </div>
+                <div class="enemy-item fast">
+                    <span class="enemy-color">노란색</span>
+                    <div class="enemy-info">
+                        <div class="enemy-name">빠른 적</div>
+                        <div class="enemy-details">20점 | 체력 1 | 빠른 속도</div>
+                    </div>
+                </div>
+                <div class="enemy-item tank">
+                    <span class="enemy-color">주황색</span>
+                    <div class="enemy-info">
+                        <div class="enemy-name">탱크 적</div>
+                        <div class="enemy-details">40점 | 체력 4 | 중간 속도</div>
+                    </div>
+                </div>
+                <div class="enemy-item special">
+                    <span class="enemy-color">청록색</span>
+                    <div class="enemy-info">
+                        <div class="enemy-name">특수 적 (아이템 드롭)</div>
+                        <div class="enemy-details">15점 | 체력 3 | 중간 속도 | 더블 레이저 드롭</div>
+                    </div>
+                </div>
+                <div class="enemy-item midboss">
+                    <span class="enemy-color">회색</span>
+                    <div class="enemy-info">
+                        <div class="enemy-name">중간보스 (5레벨마다)</div>
+                        <div class="enemy-details">80점 | 점진적 강화 | 느린 속도 | 탄환 공격</div>
+                    </div>
+                </div>
+                <div class="enemy-item boss">
+                    <span class="enemy-color">하얀색</span>
+                    <div class="enemy-info">
+                        <div class="enemy-name">보스 (10레벨마다)</div>
+                        <div class="enemy-details">120점 | 점진적 강화 | 느린 속도 | 강화 탄환 공격</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>⚡ 파워업 아이템</h3>
+            <div class="item-list">
+                <div class="item-row">
+                    <span class="item-icon">🔵</span>
+                    <div class="item-info">
+                        <div class="item-name">더블 레이저</div>
+                        <div class="item-desc">15초간 두 발의 레이저를 동시에 발사합니다 (청록색 적 처치시 드롭)</div>
+                    </div>
+                </div>
+                <div class="item-row">
+                    <span class="item-icon">⚪</span>
+                    <div class="item-info">
+                        <div class="item-name">트리플 레이저</div>
+                        <div class="item-desc">10초간 세 발의 하얀색 레이저를 동시에 발사합니다 (보스 처치시 자동 획득)</div>
+                    </div>
+                </div>
+                <div class="item-row krasthus-laser">
+                    <span class="item-icon">🔴</span>
+                    <div class="item-info">
+                        <div class="item-name">크라스투스 레이저</div>
+                        <div class="item-desc">20초간 레이저 폭이 2.5배로 증가하며 빨강색 레이저를 발사합니다 (중간 보스 처치시 자동 획득)</div>
+                    </div>
+                </div>
+                <div class="item-row">
+                    <span class="item-icon">❤️</span>
+                    <div class="item-info">
+                        <div class="item-name">생명 +1 & 동료 우주선</div>
+                        <div class="item-desc">생명 1개 증가 + 영구 동료 우주선 획득 (보스 처치시 자동 획득)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>🎯 게임 규칙</h3>
+            <p>• 시작 시 생명 3개</p>
+            <p>• 적이 화면 아래로 빠지거나 플레이어와 충돌하면 생명 감소</p>
+            <p>• 중간보스/보스와 충돌하거나 화면 밖으로 나가면 생명 2개 감소</p>
+            <p>• 중간보스/보스 탄환에 맞으면 생명 1개 감소</p>
+            <p>• 500점마다 레벨업</p>
+            <p>• <strong>5레벨마다 중간보스 등장</strong> (5, 15, 25레벨...) - 생명 +1, 크라스투스 레이저 20초 획득</p>
+            <p>• <strong>10레벨마다 보스 등장</strong> (10, 20, 30레벨...) - 생명 +1, 트리플 레이저, 동료 우주선 획득</p>
+            <p>• 보스 등장 시 기존 적들 모두 제거됨</p>
+            <p>• 연속으로 적을 맞출 때마다 콤보 보너스 점수</p>
+            <p>• <strong>크라스투스 레이저는 20초간 지속됩니다</strong></p>
+            <p>• <strong>중간보스도 2단계마다 점진적으로 강화됩니다</strong></p>
+            <p>• 동료 우주선은 플레이어와 동일한 모양이며 아이템도 수집 가능</p>
+            <p>• <strong>보스는 처치할 때마다 점진적으로 강화됩니다</strong></p>
+            <p>• <strong>팁 : 연속으로 발사한다고 명중률이 좋은 건 아닙니다</strong></p>
+        </div>
+
+        <div class="help-section">
+            <h3>⚔️ 보스전 시스템</h3>
+            <p>• 보스 레벨 도달 시 게임 일시정지 및 경고 메시지</p>
+            <p>• 스페이스바로 즉시 보스전 시작 가능 (3초 후 자동 시작)</p>
+            <p>• 중간보스: 플레이어를 향해 탄환 발사, 80점, 생명+1, 크라스투스 레이저 20초</p>
+            <p>• <strong>중간보스도 강화됩니다</strong> - 체력, 공격속도, 탄환속도, 탄환개수 증가</p>
+            <p>• 보스: 강화도에 따라 공격 속도, 탄환 속도, 탄환 개수 증가, 120점, 생명+1</p>
+            <p>• 보스 격파 시 트리플 레이저 + 동료 우주선 자동 획득</p>
+            <p>• 동료 우주선은 플레이어와 함께 공격하고 이동</p>
+            <p>• 보스전 중에는 일반 적이 등장하지 않는 순수 1대1 전투</p>
+        </div>
+
+        <div class="help-section">
+            <h3>🤝 동료 우주선 시스템</h3>
+            <p>• 연보라색(첫 번째), 연한 베이지색(두 번째) 동료 획득 가능</p>
+            <p>• 동료도 플레이어와 동일한 우주선 모양</p>
+            <p>• 모든 레이저 업그레이드 효과 공유 (더블/트리플/크라스투스 레이저)</p>
+            <p>• 동료 우주선도 아이템 수집 가능</p>
+            <p>• 플레이어 대신 희생하여 보호 역할</p>
+            <p>• 최대 2기까지 보유 가능</p>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeHelp()">✅ 확인</button>
+        </div>
+    </div>
+</div>
+
+<!-- 통계 모달 -->
+<div class="game-over-modal" id="statsModal">
+    <div class="modal-content stats-modal">
+        <h2>📊 게임 통계</h2>
+        
+        <div class="help-section">
+            <h3>전체 통계</h3>
+            <div class="stats-grid">
+                <div class="stat-row">
+                    <span class="stat-label">총 게임 수:</span>
+                    <span class="stat-value" id="modalTotalGames">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">완료한 게임:</span>
+                    <span class="stat-value" id="modalGamesCompleted">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최고 점수:</span>
+                    <span class="stat-value" id="modalHighScore">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">총 적 처치:</span>
+                    <span class="stat-value" id="modalTotalEnemies">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최고 레벨:</span>
+                    <span class="stat-value" id="modalBestLevel">1</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최고 콤보:</span>
+                    <span class="stat-value" id="modalMaxCombo">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn reset-btn" onclick="resetStats()">🗑️ 모든 기록 삭제</button>
+            <button class="control-btn" onclick="closeStats()">✅ 확인</button>
+        </div>
+        
+        <div class="warning-text">⚠️ 삭제된 기록은 복구할 수 없습니다</div>
+    </div>
+</div>
+
+</body>
+<script src="js/game12.js"></script>
+</html>

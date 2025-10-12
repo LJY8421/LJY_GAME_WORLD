@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game1.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+    <title>LJY_GAME-가위바위보</title>
+</head>
+<body>
+<div class="header">
+    <h1>✊✌️🖐️ 가위바위보 ✊✌️🖐️</h1>
+    <p>우주 최강 가위바위보 대결!</p>
+</div>
+
+<div class="game-container">
+    <div class="score-board">
+        <div class="score-item">
+            <h3>🧑🏻 당신</h3>
+            <div class="score-value" id="playerScore">0</div>
+        </div>
+        <div class="score-item">
+            <h3>🤖 AI</h3>
+            <div class="score-value" id="computerScore">0</div>
+        </div>
+    </div>
+
+    <div class="round-info">
+        <span id="roundInfo">라운드 1 | 먼저 5승하는 자가 승리!</span>
+    </div>
+
+    <div class="game-area">
+        <div class="player-section" id="playerSection">
+            <h3 style="color: #00ffff;">당신의 선택</h3>
+            <div class="player-choice" id="playerChoice">❓</div>
+        </div>
+        
+        <div class="vs-text">VS</div>
+        
+        <div class="player-section" id="computerSection">
+            <h3 style="color: #ff00ff;">AI의 선택</h3>
+            <div class="computer-choice" id="computerChoice">❓</div>
+        </div>
+    </div>
+
+    <div class="choices">
+        <button class="choice-btn" onclick="playGame('rock')" data-key="R">✊</button>
+        <button class="choice-btn" onclick="playGame('scissors')" data-key="S">✌️</button>
+        <button class="choice-btn" onclick="playGame('paper')" data-key="P">🖐️</button>
+    </div>
+
+    <div class="result" id="result">선택해 주세요!</div>
+
+    <div class="controls">
+        <button class="control-btn" onclick="pauseGame()">⏸️ 일시정지</button>
+        <button class="control-btn" onclick="resetGame()">🔄 게임 리셋</button>
+        <button class="control-btn" onclick="showHelp()">📋 도움말</button>
+        <button class="control-btn" onclick="showStats()">📊 통계 보기</button>
+        <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div>총 라운드</div>
+            <div class="stat-value" id="totalRounds">0</div>
+        </div>
+        <div class="stat-item">
+            <div>승률</div>
+            <div class="stat-value" id="winRate">0%</div>
+        </div>
+        <div class="stat-item">
+            <div>연승</div>
+            <div class="stat-value" id="winStreak">0</div>
+        </div>
+    </div>
+</div>
+
+<!-- 게임 오버 모달 -->
+<div class="game-over-modal" id="gameOverModal">
+    <div class="modal-content">
+        <h2 id="modalTitle">🎉 승리!</h2>
+        <p id="modalMessage">축하합니다! 우주 최강입니다!</p>
+        <button class="control-btn" onclick="closeModal()">다시 하기</button>
+        <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+    </div>
+</div>
+
+<!-- 도움말 모달 -->
+<div class="game-over-modal" id="helpModal">
+    <div class="modal-content help-modal">
+        <h2>📋 가위바위보 도움말</h2>
+        
+        <div class="help-section">
+            <h3>🎮 게임 목표</h3>
+            <p>• 컴퓨터와 가위바위보 대결을 펼쳐 먼저 5승을 달성하세요!</p>
+            <p>• 각 라운드에서 바위, 가위, 보 중 하나를 선택하여 승부를 겨룹니다</p>
+            <p>• 연승을 이어가서 우주 최강이 되어보세요!</p>
+        </div>
+
+        <div class="help-section">
+            <h3>🕹️ 조작법</h3>
+            <div class="control-help-grid">
+                <div class="control-help-item">
+                    <span class="help-key">R키 / 1키</span>
+                    <span>바위 선택 ✊</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">S키 / 3키</span>
+                    <span>가위 선택 ✌️</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">P키 / 2키</span>
+                    <span>보 선택 🖐️</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">ESC키</span>
+                    <span>메인 메뉴로 이동</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">위로 스와이프</span>
+                    <span>랜덤 선택 (모바일)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>⚔️ 승부 규칙</h3>
+            <div class="rule-grid">
+                <div class="rule-item win">
+                    <span class="rule-symbol">✊ > ✌️</span>
+                    <span>바위가 가위를 이김</span>
+                </div>
+                <div class="rule-item win">
+                    <span class="rule-symbol">✌️ > 🖐️</span>
+                    <span>가위가 보를 이김</span>
+                </div>
+                <div class="rule-item win">
+                    <span class="rule-symbol">🖐️ > ✊</span>
+                    <span>보가 바위를 이김</span>
+                </div>
+                <div class="rule-item draw">
+                    <span class="rule-symbol">= = =</span>
+                    <span>같으면 무승부</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>🏆 게임 진행</h3>
+            <p>• <strong>승리 조건:</strong> 먼저 5승을 달성하는 플레이어가 승리</p>
+            <p>• <strong>무승부:</strong> 같은 선택 시 무승부이며 점수 변화 없음</p>
+            <p>• <strong>연승 기록:</strong> 연속으로 승리한 횟수가 기록됩니다</p>
+            <p>• <strong>AI 대응:</strong> AI는 당신의 패턴을 학습하여 대응합니다</p>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeHelp()">✅ 확인</button>
+        </div>
+    </div>
+</div>
+
+<!-- 통계 모달 -->
+<div class="game-over-modal" id="statsModal">
+    <div class="modal-content stats-modal">
+        <h2>📊 게임 통계</h2>
+        
+        <div class="help-section">
+            <h3>🏆 개인 기록</h3>
+            <div class="stats-grid">
+                <div class="stat-row">
+                    <span class="stat-label">최고 연승:</span>
+                    <span class="stat-value highlight" id="modalMaxStreak">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">총 승리:</span>
+                    <span class="stat-value highlight" id="modalTotalWins">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">전체 승률:</span>
+                    <span class="stat-value highlight" id="modalOverallWinRate">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>📈 전체 통계</h3>
+            <div class="stats-grid">
+                <div class="stat-row">
+                    <span class="stat-label">총 게임 수:</span>
+                    <span class="stat-value" id="modalTotalGames">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">완료한 게임:</span>
+                    <span class="stat-value" id="modalCompletedGames">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">총 라운드:</span>
+                    <span class="stat-value" id="modalTotalRounds">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">무승부:</span>
+                    <span class="stat-value" id="modalTotalDraws">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>✊✌️🖐️ 선택 분석</h3>
+            <div class="choice-stats">
+                <div class="choice-stat-item">
+                    <div class="choice-icon">✊</div>
+                    <div class="choice-info">
+                        <div class="choice-name">바위</div>
+                        <div class="choice-count" id="rockCount">0회</div>
+                        <div class="choice-rate" id="rockRate">0%</div>
+                    </div>
+                </div>
+                <div class="choice-stat-item">
+                    <div class="choice-icon">✌️</div>
+                    <div class="choice-info">
+                        <div class="choice-name">가위</div>
+                        <div class="choice-count" id="scissorsCount">0회</div>
+                        <div class="choice-rate" id="scissorsRate">0%</div>
+                    </div>
+                </div>
+                <div class="choice-stat-item">
+                    <div class="choice-icon">🖐️</div>
+                    <div class="choice-info">
+                        <div class="choice-name">보</div>
+                        <div class="choice-count" id="paperCount">0회</div>
+                        <div class="choice-rate" id="paperRate">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn reset-btn" onclick="resetStats()">🗑️ 모든 기록 삭제</button>
+            <button class="control-btn" onclick="closeStats()">✅ 확인</button>
+        </div>
+        
+        <div class="warning-text">⚠️ 삭제된 기록은 복구할 수 없습니다</div>
+    </div>
+</div>
+
+</body>
+<script src="js/game1.js"></script>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game9.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+    <title>LJY_GAME-외계인 잡기</title>
+</head>
+<body>
+<div class="header">
+    <h1>👽 외계인 잡기 🔫</h1>
+    <p>침입하는 외계인들을 막아내고 지구를 구하세요!</p>
+</div>
+
+<div class="game-container">
+    <div class="score-board">
+        <div class="score-item">
+            <h3>🎯 점수</h3>
+            <div class="score-value" id="score">0</div>
+        </div>
+        <div class="score-item">
+            <h3>⏰ 시간</h3>
+            <div class="score-value" id="timeLeft">60</div>
+        </div>
+        <div class="score-item">
+            <h3>📊 레벨</h3>
+            <div class="score-value" id="level">1</div>
+        </div>
+        <div class="score-item">
+            <h3>💖 목숨</h3>
+            <div class="score-value" id="lives">❤️❤️❤️</div>
+        </div>
+    </div>
+
+    <div class="game-info">
+        <span id="gameInfo">외계인을 클릭해서 잡아보세요!</span>
+    </div>
+
+    <div class="game-area">
+        <div class="game-grid" id="gameGrid">
+            <!-- 게임 홀들이 여기에 동적으로 생성됩니다 -->
+        </div>
+        <div class="game-overlay" id="gameOverlay">
+            <div class="overlay-content">
+                <div class="overlay-title" id="overlayTitle">🎮 게임 준비!</div>
+                <div class="overlay-message" id="overlayMessage">스페이스바나 시작 버튼을 눌러 게임을 시작하세요</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-info">
+        <div class="control-item">
+            <span class="key">클릭</span>
+            <span>외계인 사격</span>
+        </div>
+        <div class="control-item">
+            <span class="key">SPACE</span>
+            <span>게임 시작 / 일시정지</span>
+        </div>
+        <div class="control-item">
+            <span class="key">P</span>
+            <span>일시정지</span>
+        </div>
+        <div class="control-item">
+            <span class="key">R</span>
+            <span>게임 재시작</span>
+        </div>
+        <div class="control-item">
+            <span class="key">H</span>
+            <span>도움말</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" onclick="startGame()">🚀 게임 시작</button>
+        <button class="control-btn" onclick="pauseGame()">⏸️ 일시정지</button>
+        <button class="control-btn" onclick="resetGame()">🔄 게임 리셋</button>
+        <button class="control-btn" onclick="showHelp()">📋 도움말</button>
+        <button class="control-btn" onclick="showStats()">📊 통계 보기</button>
+        <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div>최고점수</div>
+            <div class="stat-value" id="highScore">0</div>
+        </div>
+        <div class="stat-item">
+            <div>명중률</div>
+            <div class="stat-value" id="accuracy">0%</div>
+        </div>
+        <div class="stat-item">
+            <div>연속 히트</div>
+            <div class="stat-value" id="combo">0</div>
+        </div>
+    </div>
+</div>
+
+<!-- 게임 오버 모달 -->
+<div class="game-over-modal" id="gameOverModal">
+    <div class="modal-content">
+        <h2 id="modalTitle">🛸 게임 완료!</h2>
+        <p id="modalMessage">지구를 성공적으로 방어했습니다!</p>
+        <div class="modal-score">
+            <div>최종 점수: <span id="finalScore">0</span></div>
+            <div>도달 레벨: <span id="finalLevel">1</span></div>
+            <div>명중률: <span id="finalAccuracy">0%</span></div>
+        </div>
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeModal()">다시 하기</button>
+            <button class="control-btn" onclick="goHome()">메인으로</button>
+        </div>
+    </div>
+</div>
+
+<!-- 도움말 모달 -->
+<div class="game-over-modal" id="helpModal">
+    <div class="modal-content help-modal">
+        <h2>📋 외계인 잡기 도움말</h2>
+        
+        <div class="help-section">
+            <h3>🎯 잡아야 할 외계인 (점수 획득)</h3>
+            <div class="alien-list">
+                <div class="alien-item good">
+                    <span class="alien-emoji">👽</span>
+                    <div class="alien-info">
+                        <div class="alien-name">기본 외계인</div>
+                        <div class="alien-score">+15점 (고가치)</div>
+                    </div>
+                </div>
+                <div class="alien-item good">
+                    <span class="alien-emoji">🛸</span>
+                    <div class="alien-info">
+                        <div class="alien-name">UFO</div>
+                        <div class="alien-score">+15점 (고가치)</div>
+                    </div>
+                </div>
+                <div class="alien-item good">
+                    <span class="alien-emoji">👾</span>
+                    <div class="alien-info">
+                        <div class="alien-name">픽셀 외계인</div>
+                        <div class="alien-score">+8점</div>
+                    </div>
+                </div>
+                <div class="alien-item good">
+                    <span class="alien-emoji">🧟‍♂️</span>
+                    <div class="alien-info">
+                        <div class="alien-name">좀비 외계인</div>
+                        <div class="alien-score">+8점</div>
+                    </div>
+                </div>
+                <div class="alien-item good">
+                    <span class="alien-emoji">🧟‍♀️</span>
+                    <div class="alien-info">
+                        <div class="alien-name">좀비 외계인</div>
+                        <div class="alien-score">+8점</div>
+                    </div>
+                </div>
+                <div class="alien-item special">
+                    <span class="alien-emoji">👽</span>
+                    <div class="alien-info">
+                        <div class="alien-name">특수 외계인 (황금빛)</div>
+                        <div class="alien-score">+50점 보너스!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>⚠️ 피해야 할 함정 (점수 감점)</h3>
+            <div class="alien-list">
+                <div class="alien-item trap">
+                    <span class="alien-emoji">🪐</span>
+                    <div class="alien-info">
+                        <div class="alien-name">행성</div>
+                        <div class="alien-score">-25점</div>
+                    </div>
+                </div>
+                <div class="alien-item trap">
+                    <span class="alien-emoji">🌙</span>
+                    <div class="alien-info">
+                        <div class="alien-name">달</div>
+                        <div class="alien-score">-25점</div>
+                    </div>
+                </div>
+                <div class="alien-item trap">
+                    <span class="alien-emoji">⭐</span>
+                    <div class="alien-info">
+                        <div class="alien-name">별</div>
+                        <div class="alien-score">-25점</div>
+                    </div>
+                </div>
+                <div class="alien-item earth">
+                    <span class="alien-emoji">🌏</span>
+                    <div class="alien-info">
+                        <div class="alien-name">지구</div>
+                        <div class="alien-score">-50점 (큰 감점!)</div>
+                    </div>
+                </div>
+                <div class="alien-item earth">
+                    <span class="alien-emoji">🌎</span>
+                    <div class="alien-info">
+                        <div class="alien-name">지구</div>
+                        <div class="alien-score">-50점 (큰 감점!)</div>
+                    </div>
+                </div>
+                <div class="alien-item earth">
+                    <span class="alien-emoji">🌍</span>
+                    <div class="alien-info">
+                        <div class="alien-name">지구</div>
+                        <div class="alien-score">-50점 (큰 감점!)</div>
+                    </div>
+                </div>
+                <div class="alien-item earth">
+                    <span class="alien-emoji">🚀</span>
+                    <div class="alien-info">
+                        <div class="alien-name">로켓</div>
+                        <div class="alien-score">-50점 (큰 감점!)</div>
+                    </div>
+                </div>
+                <div class="alien-item earth">
+                    <span class="alien-emoji">🛰</span>
+                    <div class="alien-info">
+                        <div class="alien-name">인공위성</div>
+                        <div class="alien-score">-50점 (큰 감점!)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>💔 생명 시스템</h3>
+            <p>• 시작 시 생명 3개</p>
+            <p>• 빈 칸 클릭 또는 함정 클릭 3번마다 생명 1개 감소</p>
+            <p>• 빈 칸 클릭 시 -10점</p>
+            <p>• 모든 생명을 잃으면 게임 오버</p>
+        </div>
+
+        <div class="help-section">
+            <h3>🎮 게임 규칙</h3>
+            <p>• 제한 시간 60초</p>
+            <p>• 10마리 잡을 때마다 레벨업</p>
+            <p>• 레벨업 시 외계인 속도 증가, 시간 +8초 보너스</p>
+            <p>• 연속으로 맞출 때마다 콤보 보너스</p>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeHelp()">✅ 확인</button>
+        </div>
+    </div>
+</div>
+
+<!-- 통계 모달 -->
+<div class="game-over-modal" id="statsModal">
+    <div class="modal-content stats-modal">
+        <h2>📊 게임 통계</h2>
+        
+        <div class="help-section">
+            <h3>전체 통계</h3>
+            <div class="stats-grid">
+                <div class="stat-row">
+                    <span class="stat-label">총 게임 수:</span>
+                    <span class="stat-value" id="modalTotalGames">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">완료한 게임:</span>
+                    <span class="stat-value" id="modalGamesCompleted">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최고 점수:</span>
+                    <span class="stat-value" id="modalHighScore">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">총 외계인 처치:</span>
+                    <span class="stat-value" id="modalTotalAliens">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최고 레벨:</span>
+                    <span class="stat-value" id="modalBestLevel">1</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn reset-btn" onclick="resetStats()">🗑️ 모든 기록 삭제</button>
+            <button class="control-btn" onclick="closeStats()">✅ 확인</button>
+        </div>
+        
+        <div class="warning-text">⚠️ 삭제된 기록은 복구할 수 없습니다</div>
+    </div>
+</div>
+
+</body>
+<script src="js/game9.js"></script>
+</html>

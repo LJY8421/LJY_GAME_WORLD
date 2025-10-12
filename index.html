@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="LJY_GAME" />
+    <meta property="og:description" content="수업 중 몰래 시간 보내기 ㅎㅎ" />
+    <meta property="og:image" content="images/LJY_image" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="https://yourdomain.com" />
+    <meta property="og:type" content="website" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+    <title>LJY_GAME</title>
+</head>
+<body>
+<div class="header">
+    <h1>🚀 LJY GAME WORLD 🌌</h1>
+    <p>수업 중 몰래 딴짓하려고 만든 미니게임입니당 ㅎㅎ</p>
+</div>
+
+<div class="game-carousel-container">
+    <div class="game-carousel">
+        <div class="game-item active" data-game="rock-paper-scissors">
+            <div class="game-icon">✊✌️🖐️</div>
+            <div class="game-title">가위 바위 보</div>
+            <div class="game-description">AI와 가위바위보<br>대결을 펼쳐보세요!</div>
+        </div>
+        <div class="game-item next" data-game="brick-breaker">
+            <div class="game-icon">🧱</div>
+            <div class="game-title">벽돌 깨기</div>
+            <div class="game-description">공을 튕겨서 모든<br>벽돌을 부수세요!</div>
+        </div>
+        <div class="game-item hidden" data-game="snake">
+            <div class="game-icon">🐍</div>
+            <div class="game-title">스네이크</div>
+            <div class="game-description">뱀을 조종해서<br>먹이를 먹어보세요!</div>
+        </div>
+        <div class="game-item hidden" data-game="tetris">
+            <div class="game-icon">🟩</div>
+            <div class="game-title">테트리스</div>
+            <div class="game-description">블록을 쌓아서<br>라인을 완성하세요!</div>
+        </div>
+        <div class="game-item prev" data-game="reaction">
+            <div class="game-icon">⚡</div>
+            <div class="game-title">반응 속도</div>
+            <div class="game-description">빠른 반응속도를<br>테스트해보세요!</div>
+        </div>
+        <div class="game-item hidden" data-game="number-guess">
+            <div class="game-icon">💯</div>
+            <div class="game-title">숫자 맞추기</div>
+            <div class="game-description">숨겨진 숫자를<br>추리해보세요!</div>
+        </div>
+        <div class="game-item hidden" data-game="bomb-finder">
+            <div class="game-icon">💣</div>
+            <div class="game-title">폭탄 찾기</div>
+            <div class="game-description">숫자를 보고 추측해서<br>폭탄을 찾아보세요!</div>
+        </div>
+        <div class="game-item hidden" data-game="2048">
+            <div class="game-icon">🔢</div>
+            <div class="game-title">2048</div>
+            <div class="game-description">숫자를 합쳐서<br>2048을 만들어보세요!</div>
+        </div>
+        <div class="game-item hidden" data-game="alien-shooter">
+            <div class="game-icon">👽</div>
+            <div class="game-title">외계인 잡기</div>
+            <div class="game-description">외계인들을<br>잡아서 지구를 지키세요!</div>
+        </div>
+        <div class="game-item hidden" data-game="planet-dodge">
+            <div class="game-icon">🪐</div>
+            <div class="game-title">행성 피하기</div>
+            <div class="game-description">행성들을 피해<br>우주를 탐험하세요!</div>
+        </div>
+        <div class="game-item hidden" data-game="sudoku">
+            <div class="game-icon">🧩</div>
+            <div class="game-title">스도쿠</div>
+            <div class="game-description">논리적 사고로<br>9x9 퍼즐을 완성하세요!</div>
+        </div>
+        <div class="game-item prev" data-game="spaceship">
+            <div class="game-icon">🚀</div>
+            <div class="game-title">우주선 게임</div>
+            <div class="game-description">우주선을 조종해서<br>적들을 물리치세요!</div>
+        </div>
+        <div class="game-item prev" data-game="fake">
+            <div class="game-icon">🛴</div>
+            <div class="game-title">킥라니의 저주</div>
+            <div class="game-description">킥라니가 되어<br>도로를 주행하세요!</div>
+        </div>
+    </div>
+</div>
+
+<div class="navigation">
+    <button class="nav-btn" id="prevBtn">←</button>
+    <div class="current-page">
+        <span id="currentGame">가위바위보</span>
+    </div>
+    <button class="nav-btn" id="nextBtn">→</button>
+</div>
+
+<button class="start-btn" id="startBtn">🎮 게임 시작! 🎮</button>
+
+</body>
+<script src="js/index.js"></script>
+</html>

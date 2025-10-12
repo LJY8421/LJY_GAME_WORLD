@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game4.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+    <title>LJY_GAME-테트리스</title>
+</head>
+<body>
+    <div class="header">
+        <h1>🟩 테트리스 🟩</h1>
+        <p>블록을 쌓아서 라인을 완성하고 우주 최고의 테트리스 마스터가 되어보세요!</p>
+    </div>
+
+    <div class="game-container">
+        <div class="score-board">
+            <div class="score-item">
+                <h3>🎯 점수</h3>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <h3>📈 레벨</h3>
+                <div class="score-value" id="level">1</div>
+            </div>
+            <div class="score-item">
+                <h3>📏 라인</h3>
+                <div class="score-value" id="lines">0</div>
+            </div>
+        </div>
+
+        <div class="game-info" id="gameInfo">스페이스바 또는 게임 시작 버튼을 눌러 시작하세요!</div>
+
+        <div class="game-area">
+            <div class="game-board-container">
+                <canvas id="gameCanvas" width="300" height="600"></canvas>
+                <div class="game-overlay" id="gameOverlay">
+                    <div class="overlay-content">
+                        <div class="overlay-title" id="overlayTitle">🎮 게임 준비!</div>
+                        <div class="overlay-message" id="overlayMessage">방향키로 블록을 조작하세요</div>
+                        <div class="overlay-keys">SPACE키 또는 시작 버튼</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="side-panel">
+                <div class="next-piece-container">
+                    <h3>다음 블록</h3>
+                    <canvas id="nextCanvas" width="120" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-info">
+            <div class="control-item">
+                <span class="key">←→</span>
+                <span>좌우 이동</span>
+            </div>
+            <div class="control-item">
+                <span class="key">↑</span>
+                <span>회전</span>
+            </div>
+            <div class="control-item">
+                <span class="key">↓</span>
+                <span>빠른 낙하</span>
+            </div>
+            <div class="control-item">
+                <span class="key">SPACE</span>
+                <span>시작/즉시낙하</span>
+            </div>
+            <div class="control-item">
+                <span class="key">P</span>
+                <span>일시정지</span>
+            </div>
+            <div class="control-item">
+                <span class="key">R</span>
+                <span>게임 재시작</span>
+            </div>
+            <div class="control-item">
+                <span class="key">H</span>
+                <span>도움말</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" onclick="startNewGame()" id="startBtn">🚀 게임 시작</button>
+            <button class="control-btn" onclick="pauseGame()" id="pauseBtn">⏸️ 일시정지</button>
+            <button class="control-btn" onclick="resetGame()">🔄 게임 리셋</button>
+            <button class="control-btn" onclick="showHelp()">📋 도움말</button>
+            <button class="control-btn" onclick="showStats()">📊 통계 보기</button>
+            <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div>최고점수</div>
+                <div class="stat-value" id="highScore">0</div>
+            </div>
+            <div class="stat-item">
+                <div>최대레벨</div>
+                <div class="stat-value" id="maxLevel">1</div>
+            </div>
+            <div class="stat-item">
+                <div>총 라인</div>
+                <div class="stat-value" id="totalLines">0</div>
+            </div>
+        </div>
+
+        <div class="mobile-controls" id="mobileControls">
+            <div class="mobile-btn-row">
+                <button class="mobile-btn" data-action="rotate">⟲</button>
+            </div>
+            <div class="mobile-btn-row">
+                <button class="mobile-btn" data-action="left">←</button>
+                <button class="mobile-btn" data-action="pause">⏸️</button>
+                <button class="mobile-btn" data-action="right">→</button>
+            </div>
+            <div class="mobile-btn-row">
+                <button class="mobile-btn" data-action="down">↓</button>
+                <button class="mobile-btn" data-action="drop">⬇</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 오버 모달 -->
+    <div class="game-over-modal" id="gameOverModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">💀 게임 오버!</h2>
+            <p id="modalMessage">더 이상 블록을 놓을 공간이 없습니다!</p>
+            <div class="modal-score">
+                <div>최종 점수: <span id="finalScore">0</span></div>
+                <div>레벨: <span id="finalLevel">1</span></div>
+                <div>라인: <span id="finalLines">0</span></div>
+            </div>
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeModal()">다시 하기</button>
+                <button class="control-btn" onclick="goHome()">메인으로</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 도움말 모달 -->
+    <div class="game-over-modal" id="helpModal">
+        <div class="modal-content help-modal">
+            <h2>📋 테트리스 도움말</h2>
+            
+            <div class="help-section">
+                <h3>🎮 게임 조작</h3>
+                <div class="control-list">
+                    <div class="control-row">
+                        <span class="control-key">←→ 화살표 키</span>
+                        <span>블록 좌우 이동</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">↑ 화살표 키</span>
+                        <span>블록 회전</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">↓ 화살표 키</span>
+                        <span>블록 빠른 낙하</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">스페이스바</span>
+                        <span>즉시 낙하 / 게임 시작</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">P키</span>
+                        <span>게임 일시정지/재개</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">R키</span>
+                        <span>게임 재시작</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">H키</span>
+                        <span>도움말 열기</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">ESC키</span>
+                        <span>메인으로 돌아가기</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h3>🧩 테트로미노 블록들</h3>
+                <div class="tetromino-list">
+                    <div class="tetromino-item i-block">
+                        <span class="tetromino-shape">████</span>
+                        <div class="tetromino-info">
+                            <div class="tetromino-name">I-블록 (하늘색)</div>
+                            <div class="tetromino-desc">일직선 블록, 테트리스 완성에 필수</div>
+                        </div>
+                    </div>
+                    <div class="tetromino-item o-block">
+                        <span class="tetromino-shape">██<br>██</span>
+                        <div class="tetromino-info">
+                            <div class="tetromino-name">O-블록 (노란색)</div>
+                            <div class="tetromino-desc">정사각형 블록, 회전해도 모양 동일</div>
+                        </div>
+                    </div>
+                    <div class="tetromino-item t-block">
+                        <span class="tetromino-shape">&nbsp;█&nbsp;<br>███</span>
+                        <div class="tetromino-info">
+                            <div class="tetromino-name">T-블록 (보라색)</div>
+                            <div class="tetromino-desc">T자 모양, T-스핀 기술 가능</div>
+                        </div>
+                    </div>
+                    <div class="tetromino-item s-block">
+                        <span class="tetromino-shape">&nbsp;██<br>██&nbsp;</span>
+                        <div class="tetromino-info">
+                            <div class="tetromino-name">S-블록 (초록색)</div>
+                            <div class="tetromino-desc">지그재그 모양</div>
+                        </div>
+                    </div>
+                    <div class="tetromino-item z-block">
+                        <span class="tetromino-shape">██&nbsp;<br>&nbsp;██</span>
+                        <div class="tetromino-info">
+                            <div class="tetromino-name">Z-블록 (빨간색)</div>
+                            <div class="tetromino-desc">반대 지그재그 모양</div>
+                        </div>
+                    </div>
+                    <div class="tetromino-item j-block">
+                        <span class="tetromino-shape">█&nbsp;&nbsp;<br>███</span>
+                        <div class="tetromino-info">
+                            <div class="tetromino-name">J-블록 (주황색)</div>
+                            <div class="tetromino-desc">J자 모양</div>
+                        </div>
+                    </div>
+                    <div class="tetromino-item l-block">
+                        <span class="tetromino-shape">&nbsp;&nbsp;█<br>███</span>
+                        <div class="tetromino-info">
+                            <div class="tetromino-name">L-블록 (파란색)</div>
+                            <div class="tetromino-desc">L자 모양</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h3>🎯 게임 규칙</h3>
+                <p>• 떨어지는 블록을 조작하여 가로줄을 완성하세요</p>
+                <p>• 완성된 라인은 사라지고 점수를 획득합니다</p>
+                <p>• 10줄 완성마다 레벨이 올라가고 속도가 빨라집니다</p>
+                <p>• 블록이 맨 위에 닿으면 게임 오버입니다</p>
+                <p>• 한 번에 많은 라인을 지울수록 높은 점수!</p>
+            </div>
+
+            <div class="help-section">
+                <h3>🏆 점수 시스템</h3>
+                <p>• 1줄: 100 × 레벨</p>
+                <p>• 2줄: 300 × 레벨</p>
+                <p>• 3줄: 500 × 레벨</p>
+                <p>• 4줄: 800 × 레벨</p>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeHelp()">✅ 확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 통계 모달 -->
+    <div class="game-over-modal" id="statsModal">
+        <div class="modal-content stats-modal">
+            <h2>📊 테트리스 통계</h2>
+            
+            <div class="help-section">
+                <h3>전체 통계</h3>
+                <div class="stats-grid">
+                    <div class="stat-row">
+                        <span class="stat-label">총 게임 수:</span>
+                        <span class="stat-value" id="modalTotalGames">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">완료한 게임:</span>
+                        <span class="stat-value" id="modalGamesCompleted">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">최고 점수:</span>
+                        <span class="stat-value" id="modalHighScore">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">최고 레벨:</span>
+                        <span class="stat-value" id="modalMaxLevel">1</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">총 라인 클리어:</span>
+                        <span class="stat-value" id="modalTotalLines">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">총 테트리스:</span>
+                        <span class="stat-value" id="modalTotalTetris">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">평균 점수:</span>
+                        <span class="stat-value" id="modalAvgScore">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="control-btn reset-btn" onclick="resetStats()">🗑️ 모든 기록 삭제</button>
+                <button class="control-btn" onclick="closeStats()">✅ 확인</button>
+            </div>
+            
+            <div class="warning-text">⚠️ 삭제된 기록은 복구할 수 없습니다</div>
+        </div>
+    </div>
+
+    <script src="js/game4.js"></script>
+</body>
+</html>

@@ -1,0 +1,1940 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    background: #000011;
+    background-image: 
+        radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+        radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+        radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px),
+        radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 2px, transparent 30px);
+    background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px;
+    background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #ffffff;
+    overflow-x: hidden;
+    position: relative;
+    padding: 20px 0;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(ellipse at 10% 20%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 20%, rgba(255, 247, 119, 0.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 30% 90%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+    z-index: -1;
+    animation: nebula 30s ease-in-out infinite alternate;
+}
+
+@keyframes nebula {
+    0% { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 0.9; transform: scale(1.1); }
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    animation: fadeInDown 1.5s ease-out;
+}
+
+.header h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 15px;
+    color: #fff;
+    text-shadow: 
+        0 0 5px #fff,
+        0 0 10px #fff,
+        0 0 15px #00ffff,
+        0 0 20px #00ffff,
+        0 0 35px #00ffff,
+        0 0 40px #00ffff;
+    animation: glow 2s ease-in-out infinite alternate;
+    letter-spacing: 2px;
+}
+
+.header p {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    opacity: 0.8;
+    color: #b8b8ff;
+    text-shadow: 0 0 10px rgba(184, 184, 255, 0.5);
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 
+            0 0 5px #fff,
+            0 0 10px #fff,
+            0 0 15px #00ffff,
+            0 0 20px #00ffff,
+            0 0 35px #00ffff,
+            0 0 40px #00ffff;
+    }
+    to {
+        text-shadow: 
+            0 0 2px #fff,
+            0 0 5px #fff,
+            0 0 8px #ff00ff,
+            0 0 12px #ff00ff,
+            0 0 18px #ff00ff,
+            0 0 25px #ff00ff;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.game-container {
+    max-width: 900px;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.score-board {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.score-item {
+    text-align: center;
+    background: rgba(0, 20, 40, 0.7);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 15px 20px;
+    min-width: 120px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+}
+
+.score-item h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+.score-value {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.game-info {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    color: #b8b8ff;
+    text-shadow: 0 0 10px rgba(184, 184, 255, 0.5);
+}
+
+.game-area {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.game-board {
+    width: 100%;
+    max-width: 800px;
+    background: rgba(0, 10, 20, 0.8);
+    border: 3px solid rgba(0, 255, 255, 0.6);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.3),
+        inset 0 0 30px rgba(0, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.number-display {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.mystery-number {
+    font-size: 4rem;
+    font-weight: 900;
+    color: #00ffff;
+    text-shadow: 
+        0 0 10px #00ffff,
+        0 0 20px #00ffff,
+        0 0 30px #00ffff;
+    animation: pulse 2s ease-in-out infinite alternate;
+    margin-bottom: 15px;
+    letter-spacing: 10px;
+}
+
+.range-info {
+    font-size: 1.2rem;
+    color: #b8b8ff;
+    opacity: 0.8;
+}
+
+@keyframes pulse {
+    from { opacity: 0.8; transform: scale(1); }
+    to { opacity: 1; transform: scale(1.05); }
+}
+
+.input-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+/* 커스텀 스피너를 위한 컨테이너 */
+.input-container {
+    position: relative;
+    display: inline-block;
+}
+
+#guessInput {
+    font-family: 'Orbitron', monospace;
+    background: rgba(0, 20, 40, 0.8);
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    color: #ffffff;
+    padding: 15px 45px 15px 20px; /* 오른쪽에 스피너 공간 확보 */
+    border-radius: 15px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+    width: 200px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    -moz-appearance: textfield; /* Firefox 스피너 숨기기 */
+}
+
+/* 웹킷 기반 브라우저 스피너 숨기기 */
+#guessInput::-webkit-outer-spin-button,
+#guessInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#guessInput:focus {
+    outline: none;
+    border-color: rgba(255, 0, 255, 0.7);
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.4);
+}
+
+#guessInput::placeholder {
+    color: rgba(184, 184, 255, 0.5);
+}
+
+/* 커스텀 스피너 스타일 */
+.custom-spinner {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 10;
+}
+
+.spinner-btn {
+    width: 22px;
+    height: 14px;
+    background: linear-gradient(45deg, rgba(0, 255, 255, 0.3), rgba(255, 0, 255, 0.3));
+    border: 1px solid rgba(0, 255, 255, 0.6);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00ffff;
+    font-size: 10px;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+    box-shadow: 
+        0 0 8px rgba(0, 255, 255, 0.4),
+        inset 0 0 8px rgba(0, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    user-select: none;
+    font-family: monospace;
+}
+
+.spinner-btn:hover {
+    background: linear-gradient(45deg, rgba(0, 255, 255, 0.5), rgba(255, 0, 255, 0.5));
+    border-color: rgba(255, 0, 255, 0.8);
+    color: #ff00ff;
+    text-shadow: 0 0 8px rgba(255, 0, 255, 0.8);
+    box-shadow: 
+        0 0 15px rgba(255, 0, 255, 0.6),
+        inset 0 0 12px rgba(255, 0, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.spinner-btn:active {
+    transform: scale(0.95);
+    box-shadow: 
+        0 0 8px rgba(255, 0, 255, 0.4),
+        inset 0 0 8px rgba(255, 0, 255, 0.3);
+}
+
+.spinner-up::before {
+    content: "▲";
+    font-size: 8px;
+}
+
+.spinner-down::before {
+    content: "▼";
+    font-size: 8px;
+}
+
+/* 네온 글로우 애니메이션 */
+@keyframes spinnerGlow {
+    0% { 
+        box-shadow: 
+            0 0 8px rgba(0, 255, 255, 0.4),
+            inset 0 0 8px rgba(0, 255, 255, 0.1);
+    }
+    50% { 
+        box-shadow: 
+            0 0 20px rgba(255, 0, 255, 0.6),
+            inset 0 0 15px rgba(255, 0, 255, 0.2);
+    }
+    100% { 
+        box-shadow: 
+            0 0 8px rgba(0, 255, 255, 0.4),
+            inset 0 0 8px rgba(0, 255, 255, 0.1);
+    }
+}
+
+.spinner-btn {
+    animation: spinnerGlow 3s ease-in-out infinite;
+}
+
+/* 입력 필드 포커스시 스피너도 강조 */
+#guessInput:focus + .custom-spinner .spinner-btn {
+    border-color: rgba(255, 0, 255, 0.8);
+    animation: spinnerGlow 1.5s ease-in-out infinite;
+}
+
+.guess-btn {
+    font-family: 'Orbitron', monospace;
+    background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+    border: 2px solid rgba(0, 255, 255, 0.6);
+    color: #ffffff;
+    padding: 15px 25px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.4),
+        inset 0 0 20px rgba(0, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    white-space: nowrap;
+}
+
+.guess-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(45deg, rgba(0, 255, 255, 0.3), rgba(255, 0, 255, 0.3));
+    border-color: rgba(255, 0, 255, 0.8);
+    box-shadow: 
+        0 0 30px rgba(255, 0, 255, 0.6),
+        inset 0 0 30px rgba(255, 0, 255, 0.1);
+}
+
+.guess-btn:active {
+    transform: translateY(0);
+}
+
+.guess-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.hint-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.hint-text {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffff00;
+    text-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
+    margin-bottom: 10px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.attempts-info {
+    font-size: 1rem;
+    color: #b8b8ff;
+    opacity: 0.9;
+}
+
+.history-section {
+    margin-top: 20px;
+}
+
+.history-section h3 {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    margin-bottom: 15px;
+}
+
+.guess-history {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.guess-item {
+    background: rgba(0, 40, 80, 0.6);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(5px);
+}
+
+.guess-number {
+    font-weight: 700;
+    color: #00ffff;
+}
+
+.guess-hint {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.game-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    backdrop-filter: blur(20px);
+    transition: opacity 0.3s ease;
+}
+
+.game-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay-content {
+    text-align: center;
+    color: #ffffff;
+}
+
+.overlay-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 20px;
+    text-shadow: 
+        0 0 10px #00ffff,
+        0 0 20px #00ffff,
+        0 0 30px #00ffff;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.overlay-message {
+    font-size: 1.2rem;
+    opacity: 0.8;
+    color: #b8b8ff;
+}
+
+.controls-info {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.control-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #b8b8ff;
+}
+
+.key {
+    background: rgba(0, 20, 40, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    color: #00ffff;
+    min-width: 60px;
+    text-align: center;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.control-btn {
+    font-family: 'Orbitron', monospace;
+    background: rgba(0, 20, 40, 0.7);
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    color: #00ffff;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    white-space: nowrap;
+}
+
+.control-btn:hover {
+    background: rgba(0, 40, 80, 0.8);
+    border-color: rgba(255, 0, 255, 0.7);
+    color: #ff00ff;
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.5);
+}
+
+.control-btn:active {
+    transform: translateY(0);
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+    background: rgba(0, 20, 40, 0.7);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 10px 15px;
+    min-width: 100px;
+    font-size: 0.9rem;
+    color: #b8b8ff;
+    backdrop-filter: blur(10px);
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #00ffff;
+    margin-top: 5px;
+}
+
+.game-over-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(20px);
+}
+
+.modal-content {
+    background: rgba(0, 20, 40, 0.95);
+    border: 2px solid rgba(0, 255, 255, 0.6);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 
+        0 0 50px rgba(0, 255, 255, 0.4),
+        inset 0 0 30px rgba(0, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+}
+
+.modal-content h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-shadow: 
+        0 0 10px #00ffff,
+        0 0 20px #00ffff;
+}
+
+.modal-content p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: #b8b8ff;
+    opacity: 0.9;
+}
+
+.modal-score {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(0, 40, 80, 0.6);
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.modal-score div {
+    font-size: 1.1rem;
+    margin: 5px 0;
+    color: #00ffff;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* 도움말 및 통계 모달 스타일 */
+.help-modal,
+.stats-modal {
+    max-width: 600px !important;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.help-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    text-align: left;
+}
+
+.help-section:last-of-type {
+    border-bottom: none;
+}
+
+.help-section h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    text-align: center;
+}
+
+.help-section p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #b8b8ff;
+    line-height: 1.4;
+}
+
+/* 조작 방법 스타일 */
+.control-list {
+    display: grid;
+    gap: 12px;
+}
+
+.control-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 15px;
+    background: rgba(0, 40, 80, 0.4);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 8px;
+}
+
+.control-key {
+    background: rgba(0, 255, 255, 0.2);
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    color: #00ffff;
+    min-width: 120px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+/* 힌트 시스템 스타일 */
+.hint-list {
+    display: grid;
+    gap: 12px;
+}
+
+.hint-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid;
+}
+
+.hint-item.close {
+    background: rgba(255, 100, 0, 0.3);
+    border-color: rgba(255, 100, 0, 0.4);
+}
+
+.hint-item.near {
+    background: rgba(255, 255, 0, 0.3);
+    border-color: rgba(255, 255, 0, 0.4);
+}
+
+.hint-item.medium {
+    background: rgba(0, 150, 255, 0.3);
+    border-color: rgba(0, 150, 255, 0.4);
+}
+
+.hint-item.far {
+    background: rgba(128, 128, 128, 0.3);
+    border-color: rgba(128, 128, 128, 0.4);
+}
+
+.hint-icon {
+    font-size: 1.5rem;
+    min-width: 40px;
+    text-align: center;
+}
+
+.hint-info {
+    flex: 1;
+}
+
+.hint-name {
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+    font-size: 1rem;
+}
+
+.hint-desc {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    color: #b8b8ff;
+}
+
+/* 통계 그리드 */
+.stats-grid {
+    display: grid;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: rgba(0, 40, 80, 0.4);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 8px;
+}
+
+.stat-label {
+    color: #b8b8ff;
+    font-size: 1rem;
+}
+
+.reset-btn {
+    background: linear-gradient(145deg, rgba(255, 50, 50, 0.8), rgba(200, 0, 0, 0.8)) !important;
+    border-color: rgba(255, 100, 100, 0.6) !important;
+}
+
+.reset-btn:hover {
+    background: linear-gradient(145deg, rgba(255, 100, 100, 0.9), rgba(255, 0, 0, 0.9)) !important;
+    border-color: rgba(255, 150, 150, 0.8) !important;
+    color: #ffffff !important;
+}
+
+.warning-text {
+    text-align: center;
+    color: #ffaa00;
+    font-size: 0.9em;
+    margin-top: 15px;
+    opacity: 0.8;
+}
+
+/* 네온 스타일 스크롤바 */
+.help-modal::-webkit-scrollbar,
+.stats-modal::-webkit-scrollbar {
+    width: 12px;
+}
+
+.help-modal::-webkit-scrollbar-track,
+.stats-modal::-webkit-scrollbar-track {
+    background: rgba(0, 10, 20, 0.8);
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.help-modal::-webkit-scrollbar-thumb,
+.stats-modal::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+        180deg,
+        rgba(0, 255, 255, 0.8) 0%,
+        rgba(0, 200, 255, 0.6) 50%,
+        rgba(0, 150, 255, 0.8) 100%
+    );
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    box-shadow: 
+        0 0 10px rgba(0, 255, 255, 0.5),
+        inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.help-modal::-webkit-scrollbar-thumb:hover,
+.stats-modal::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+        180deg,
+        rgba(255, 0, 255, 0.8) 0%,
+        rgba(200, 0, 255, 0.6) 50%,
+        rgba(150, 0, 255, 0.8) 100%
+    );
+    box-shadow: 
+        0 0 15px rgba(255, 0, 255, 0.7),
+        inset 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.help-modal::-webkit-scrollbar-corner,
+.stats-modal::-webkit-scrollbar-corner {
+    background: rgba(0, 10, 20, 0.8);
+}
+
+/* Firefox 스크롤바 */
+.help-modal,
+.stats-modal {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 255, 255, 0.8) rgba(0, 10, 20, 0.8);
+}
+
+/* 애니메이션 효과 */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 53%, 80%, 100% {
+        transform: translate3d(0,0,0);
+    }
+    40%, 43% {
+        transform: translate3d(0, -10px, 0);
+    }
+    70% {
+        transform: translate3d(0, -5px, 0);
+    }
+    90% {
+        transform: translate3d(0, -2px, 0);
+    }
+}
+
+.correct-guess {
+    animation: bounce 1s ease-in-out;
+    color: #00ff00 !important;
+    text-shadow: 0 0 20px rgba(0, 255, 0, 0.8) !important;
+}
+
+.wrong-guess {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* 기본 스타일은 1920px 이상에서 적용 */
+
+/* 1366px 이하 - 노트북 */
+@media (max-width: 1366px) {
+    .header h1 {
+        font-size: 2.8rem;
+        letter-spacing: 1.5px;
+    }
+    
+    .header p {
+        font-size: 1rem;
+    }
+    
+    .game-container {
+        max-width: 800px;
+    }
+    
+    .game-board {
+        max-width: 700px;
+        padding: 25px;
+    }
+    
+    .mystery-number {
+        font-size: 3.5rem;
+        letter-spacing: 8px;
+    }
+    
+    .score-item {
+        min-width: 110px;
+        padding: 12px 18px;
+    }
+    
+    .score-value {
+        font-size: 1.6rem;
+    }
+    
+    #guessInput {
+        width: 180px;
+        font-size: 1.1rem;
+    }
+    
+    .guess-btn {
+        padding: 12px 22px;
+        font-size: 1rem;
+    }
+}
+
+/* 1024px 이하 - 태블릿 가로 */
+@media (max-width: 1024px) {
+    .header h1 {
+        font-size: 2.5rem;
+        letter-spacing: 1px;
+    }
+    
+    .header p {
+        font-size: 0.95rem;
+    }
+    
+    .game-container {
+        max-width: 700px;
+    }
+    
+    .game-board {
+        max-width: 600px;
+        padding: 20px;
+    }
+    
+    .mystery-number {
+        font-size: 3rem;
+        letter-spacing: 6px;
+    }
+    
+    .score-board {
+        gap: 15px;
+    }
+    
+    .score-item {
+        min-width: 100px;
+        padding: 10px 15px;
+    }
+    
+    .score-item h3 {
+        font-size: 0.9rem;
+    }
+    
+    .score-value {
+        font-size: 1.5rem;
+    }
+    
+    #guessInput {
+        width: 160px;
+        padding: 12px 40px 12px 18px;
+        font-size: 1rem;
+    }
+    
+    .custom-spinner {
+        right: 6px;
+    }
+    
+    .spinner-btn {
+        width: 20px;
+        height: 13px;
+    }
+    
+    .guess-btn {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+    
+    .hint-text {
+        font-size: 1.2rem;
+    }
+    
+    .controls-info {
+        gap: 20px;
+    }
+    
+    .control-btn {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+    }
+    
+    .modal-content {
+        padding: 35px;
+        max-width: 350px;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.8rem;
+    }
+    
+    .help-modal,
+    .stats-modal {
+        max-width: 500px !important;
+    }
+}
+
+/* 768px 이하 - 태블릿 세로 */
+@media (max-width: 768px) {
+    body {
+        padding: 15px 0;
+    }
+    
+    .header {
+        margin-bottom: 25px;
+    }
+    
+    .header h1 {
+        font-size: 2.2rem;
+        margin-bottom: 12px;
+    }
+    
+    .header p {
+        font-size: 0.9rem;
+    }
+    
+    .game-container {
+        max-width: 100%;
+        padding: 0 15px;
+    }
+    
+    .game-board {
+        max-width: 100%;
+        padding: 18px;
+    }
+    
+    .mystery-number {
+        font-size: 2.8rem;
+        letter-spacing: 5px;
+        margin-bottom: 12px;
+    }
+    
+    .range-info {
+        font-size: 1.1rem;
+    }
+    
+    .score-board {
+        gap: 12px;
+        justify-content: center;
+    }
+    
+    .score-item {
+        min-width: 90px;
+        padding: 8px 12px;
+    }
+    
+    .score-item h3 {
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+    }
+    
+    .score-value {
+        font-size: 1.4rem;
+    }
+    
+    .game-info {
+        font-size: 1rem;
+        margin-bottom: 18px;
+    }
+    
+    .input-section {
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+    
+    #guessInput {
+        width: 150px;
+        padding: 10px 35px 10px 15px;
+        font-size: 0.95rem;
+    }
+    
+    .custom-spinner {
+        right: 5px;
+    }
+    
+    .spinner-btn {
+        width: 18px;
+        height: 12px;
+        font-size: 9px;
+    }
+    
+    .guess-btn {
+        padding: 10px 18px;
+        font-size: 0.9rem;
+    }
+    
+    .hint-text {
+        font-size: 1.1rem;
+        min-height: 35px;
+    }
+    
+    .attempts-info {
+        font-size: 0.9rem;
+    }
+    
+    .guess-history {
+        max-height: 130px;
+        gap: 8px;
+    }
+    
+    .guess-item {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .controls-info {
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .control-item {
+        font-size: 0.8rem;
+    }
+    
+    .key {
+        min-width: 50px;
+        padding: 3px 6px;
+        font-size: 0.75rem;
+    }
+    
+    .controls {
+        gap: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .control-btn {
+        padding: 8px 15px;
+        font-size: 0.8rem;
+    }
+    
+    .overlay-title {
+        font-size: 2.2rem;
+        margin-bottom: 15px;
+    }
+    
+    .overlay-message {
+        font-size: 1.1rem;
+    }
+    
+    .modal-content {
+        padding: 30px;
+        max-width: 320px;
+        width: 95%;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.6rem;
+        margin-bottom: 15px;
+    }
+    
+    .modal-content p {
+        font-size: 1rem;
+        margin-bottom: 15px;
+    }
+    
+    .modal-buttons {
+        gap: 12px;
+    }
+    
+    .help-modal,
+    .stats-modal {
+        max-width: 95% !important;
+        max-height: 85vh;
+    }
+    
+    .help-section {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+    
+    .help-section h3 {
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+    }
+    
+    .control-row,
+    .hint-item,
+    .stat-row {
+        padding: 10px 12px;
+    }
+    
+    .control-key {
+        min-width: 100px;
+        font-size: 0.8rem;
+    }
+    
+    .hint-name {
+        font-size: 0.9rem;
+    }
+    
+    .hint-desc {
+        font-size: 0.8rem;
+    }
+}
+
+/* 480px 이하 - 모바일 가로 */
+@media (max-width: 480px) {
+    body {
+        padding: 10px 0;
+    }
+    
+    .header {
+        margin-bottom: 20px;
+    }
+    
+    .header h1 {
+        font-size: 1.9rem;
+        margin-bottom: 10px;
+    }
+    
+    .header p {
+        font-size: 0.85rem;
+    }
+    
+    .game-container {
+        padding: 0 10px;
+    }
+    
+    .game-board {
+        padding: 15px;
+        border-width: 2px;
+    }
+    
+    .mystery-number {
+        font-size: 2.5rem;
+        letter-spacing: 3px;
+        margin-bottom: 10px;
+    }
+    
+    .range-info {
+        font-size: 1rem;
+    }
+    
+    .score-board {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .score-item {
+        min-width: 80px;
+        padding: 6px 10px;
+        flex: 1;
+        max-width: calc(50% - 4px);
+    }
+    
+    .score-item h3 {
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+    }
+    
+    .score-value {
+        font-size: 1.2rem;
+    }
+    
+    .game-info {
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+    
+    .input-section {
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    #guessInput {
+        width: 100%;
+        max-width: 200px;
+        padding: 8px 30px 8px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .custom-spinner {
+        right: 4px;
+    }
+    
+    .spinner-btn {
+        width: 16px;
+        height: 10px;
+        font-size: 8px;
+    }
+    
+    .spinner-up::before {
+        font-size: 6px;
+    }
+    
+    .spinner-down::before {
+        font-size: 6px;
+    }
+    
+    .guess-btn {
+        padding: 8px 15px;
+        font-size: 0.85rem;
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    .hint-text {
+        font-size: 1rem;
+        min-height: 30px;
+    }
+    
+    .attempts-info {
+        font-size: 0.85rem;
+    }
+    
+    .guess-history {
+        max-height: 100px;
+        gap: 6px;
+    }
+    
+    .guess-item {
+        padding: 5px 8px;
+        font-size: 0.8rem;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .controls-info {
+        gap: 10px;
+        flex-direction: column;
+        margin-bottom: 10px;
+    }
+    
+    .control-item {
+        font-size: 0.75rem;
+        justify-content: center;
+    }
+    
+    .key {
+        min-width: 40px;
+        padding: 2px 4px;
+        font-size: 0.7rem;
+    }
+    
+    .controls {
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .control-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        flex: 1;
+        min-width: calc(50% - 4px);
+        max-width: 150px;
+    }
+    
+    .overlay-title {
+        font-size: 1.8rem;
+        margin-bottom: 12px;
+    }
+    
+    .overlay-message {
+        font-size: 1rem;
+    }
+    
+    .modal-content {
+        padding: 20px;
+        max-width: 280px;
+        width: 90%;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.4rem;
+        margin-bottom: 12px;
+    }
+    
+    .modal-content p {
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+    }
+    
+    .modal-score div {
+        font-size: 1rem;
+        margin: 3px 0;
+    }
+    
+    .modal-buttons {
+        gap: 8px;
+        flex-direction: column;
+    }
+    
+    .modal-buttons .control-btn {
+        max-width: none;
+        width: 100%;
+    }
+    
+    .help-modal,
+    .stats-modal {
+        max-width: 90% !important;
+        max-height: 90vh;
+    }
+    
+    .help-section {
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+    }
+    
+    .help-section h3 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+    
+    .help-section p {
+        font-size: 0.85rem;
+    }
+    
+    .control-row,
+    .hint-item,
+    .stat-row {
+        flex-direction: column;
+        text-align: center;
+        gap: 6px;
+        padding: 8px 10px;
+    }
+    
+    .control-key {
+        min-width: auto;
+        width: 100%;
+        font-size: 0.75rem;
+    }
+    
+    .hint-icon {
+        font-size: 1.2rem;
+    }
+    
+    .hint-name {
+        font-size: 0.85rem;
+    }
+    
+    .hint-desc {
+        font-size: 0.75rem;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+    }
+    
+    .stats {
+        gap: 8px;
+    }
+    
+    .stat-item {
+        min-width: 80px;
+        padding: 8px 10px;
+        font-size: 0.8rem;
+        flex: 1;
+    }
+    
+    .stat-value {
+        font-size: 1rem;
+    }
+}
+
+/* 360px 이하 - 소형 모바일 */
+@media (max-width: 360px) {
+    .header h1 {
+        font-size: 1.7rem;
+    }
+    
+    .header p {
+        font-size: 0.8rem;
+    }
+    
+    .game-board {
+        padding: 12px;
+    }
+    
+    .mystery-number {
+        font-size: 2.2rem;
+        letter-spacing: 2px;
+    }
+    
+    .score-board {
+        gap: 6px;
+    }
+    
+    .score-item {
+        min-width: 70px;
+        padding: 5px 8px;
+    }
+    
+    .score-item h3 {
+        font-size: 0.75rem;
+    }
+    
+    .score-value {
+        font-size: 1.1rem;
+    }
+    
+    #guessInput {
+        max-width: 180px;
+        padding: 6px 25px 6px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .guess-btn {
+        max-width: 180px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .hint-text {
+        font-size: 0.9rem;
+    }
+    
+    .control-btn {
+        padding: 5px 10px;
+        font-size: 0.7rem;
+    }
+    
+    .overlay-title {
+        font-size: 1.6rem;
+    }
+    
+    .overlay-message {
+        font-size: 0.9rem;
+    }
+    
+    .modal-content {
+        padding: 15px;
+        max-width: 250px;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.2rem;
+    }
+    
+    .modal-content p {
+        font-size: 0.8rem;
+    }
+    
+    .help-section h3 {
+        font-size: 1rem;
+    }
+    
+    .help-section p {
+        font-size: 0.8rem;
+    }
+    
+    .control-key {
+        font-size: 0.7rem;
+        padding: 2px 4px;
+    }
+    
+    .hint-name {
+        font-size: 0.8rem;
+    }
+    
+    .hint-desc {
+        font-size: 0.7rem;
+    }
+}
+
+/* 전체 페이지 네온 스크롤바 - 모든 화면 크기에 적용 */
+body::-webkit-scrollbar {
+    width: 12px;
+}
+
+body::-webkit-scrollbar-track {
+    background: rgba(0, 10, 20, 0.8);
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+body::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+        180deg,
+        rgba(0, 255, 255, 0.8) 0%,
+        rgba(0, 200, 255, 0.6) 50%,
+        rgba(0, 150, 255, 0.8) 100%
+    );
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    box-shadow: 
+        0 0 10px rgba(0, 255, 255, 0.5),
+        inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+        180deg,
+        rgba(255, 0, 255, 0.8) 0%,
+        rgba(200, 0, 255, 0.6) 50%,
+        rgba(150, 0, 255, 0.8) 100%
+    );
+    box-shadow: 
+        0 0 15px rgba(255, 0, 255, 0.7),
+        inset 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+body::-webkit-scrollbar-corner {
+    background: rgba(0, 10, 20, 0.8);
+}
+
+/* Firefox 스크롤바 */
+body {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 255, 255, 0.8) rgba(0, 10, 20, 0.8);
+}
+
+/* 모바일에서 스크롤바 크기 조정 */
+@media (max-width: 768px) {
+    body::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    body::-webkit-scrollbar-thumb {
+        border-radius: 8px;
+        box-shadow: 
+            0 0 8px rgba(0, 255, 255, 0.5),
+            inset 0 0 8px rgba(255, 255, 255, 0.2);
+    }
+    
+    body::-webkit-scrollbar-thumb:hover {
+        box-shadow: 
+            0 0 12px rgba(255, 0, 255, 0.7),
+            inset 0 0 8px rgba(255, 255, 255, 0.3);
+    }
+}
+
+@media (max-width: 480px) {
+    body::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    body::-webkit-scrollbar-thumb {
+        border-radius: 6px;
+        box-shadow: 
+            0 0 6px rgba(0, 255, 255, 0.5),
+            inset 0 0 6px rgba(255, 255, 255, 0.2);
+    }
+    
+    body::-webkit-scrollbar-thumb:hover {
+        box-shadow: 
+            0 0 10px rgba(255, 0, 255, 0.7),
+            inset 0 0 6px rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* 320px 이하 - 최소 모바일 */
+@media (max-width: 320px) {
+    body {
+        padding: 5px 0;
+    }
+    
+    body::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    body::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        box-shadow: 
+            0 0 4px rgba(0, 255, 255, 0.5),
+            inset 0 0 4px rgba(255, 255, 255, 0.2);
+    }
+    
+    body::-webkit-scrollbar-thumb:hover {
+        box-shadow: 
+            0 0 8px rgba(255, 0, 255, 0.7),
+            inset 0 0 4px rgba(255, 255, 255, 0.3);
+    }
+    
+    .header {
+        margin-bottom: 15px;
+    }
+    
+    .header h1 {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+    
+    .header p {
+        font-size: 0.75rem;
+    }
+    
+    .game-container {
+        padding: 0 5px;
+    }
+    
+    .game-board {
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .mystery-number {
+        font-size: 2rem;
+        letter-spacing: 1px;
+    }
+    
+    .range-info {
+        font-size: 0.9rem;
+    }
+    
+    .score-board {
+        gap: 4px;
+    }
+    
+    .score-item {
+        min-width: 60px;
+        padding: 4px 6px;
+    }
+    
+    .score-item h3 {
+        font-size: 0.7rem;
+        margin-bottom: 2px;
+    }
+    
+    .score-value {
+        font-size: 1rem;
+    }
+    
+    .game-info {
+        font-size: 0.8rem;
+        margin-bottom: 12px;
+    }
+    
+    #guessInput {
+        max-width: 150px;
+        padding: 5px 22px 5px 8px;
+        font-size: 0.8rem;
+    }
+    
+    .custom-spinner {
+        right: 3px;
+    }
+    
+    .spinner-btn {
+        width: 14px;
+        height: 8px;
+        font-size: 7px;
+    }
+    
+    .guess-btn {
+        max-width: 150px;
+        padding: 5px 10px;
+        font-size: 0.75rem;
+    }
+    
+    .hint-text {
+        font-size: 0.85rem;
+        min-height: 25px;
+    }
+    
+    .attempts-info {
+        font-size: 0.8rem;
+    }
+    
+    .guess-history {
+        max-height: 80px;
+        gap: 4px;
+    }
+    
+    .guess-item {
+        padding: 4px 6px;
+        font-size: 0.75rem;
+    }
+    
+    .controls-info {
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .control-item {
+        font-size: 0.7rem;
+    }
+    
+    .key {
+        min-width: 35px;
+        padding: 1px 3px;
+        font-size: 0.65rem;
+    }
+    
+    .controls {
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+    
+    .control-btn {
+        padding: 4px 8px;
+        font-size: 0.65rem;
+        min-width: calc(50% - 3px);
+        max-width: 120px;
+    }
+    
+    .overlay-title {
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+    }
+    
+    .overlay-message {
+        font-size: 0.85rem;
+    }
+    
+    .modal-content {
+        padding: 12px;
+        max-width: 220px;
+        width: 85%;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+    
+    .modal-content p {
+        font-size: 0.75rem;
+        margin-bottom: 10px;
+    }
+    
+    .modal-score {
+        margin: 15px 0;
+        padding: 10px;
+    }
+    
+    .modal-score div {
+        font-size: 0.9rem;
+        margin: 2px 0;
+    }
+    
+    .help-modal,
+    .stats-modal {
+        max-width: 85% !important;
+        max-height: 95vh;
+    }
+    
+    .help-section {
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+    }
+    
+    .help-section h3 {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+    
+    .help-section p {
+        font-size: 0.75rem;
+        line-height: 1.3;
+    }
+    
+    .control-row,
+    .hint-item,
+    .stat-row {
+        padding: 6px 8px;
+        gap: 4px;
+    }
+    
+    .control-key {
+        font-size: 0.65rem;
+        padding: 1px 3px;
+    }
+    
+    .hint-icon {
+        font-size: 1rem;
+    }
+    
+    .hint-name {
+        font-size: 0.75rem;
+    }
+    
+    .hint-desc {
+        font-size: 0.65rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .stats {
+        gap: 6px;
+    }
+    
+    .stat-item {
+        min-width: 70px;
+        padding: 6px 8px;
+        font-size: 0.75rem;
+    }
+    
+    .stat-value {
+        font-size: 0.9rem;
+        margin-top: 3px;
+    }
+    
+    .reset-btn {
+        font-size: 0.65rem !important;
+    }
+    
+    .warning-text {
+        font-size: 0.7rem;
+        margin-top: 10px;
+    }
+}

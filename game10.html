@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game10.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+    <title>LJY_GAME-행성 피하기</title>
+</head>
+<body>
+    <div class="header">
+        <h1>🪐 행성 피하기 🪐</h1>
+        <p>날아오는 행성들을 피해서 우주를 탐험하세요!</p>
+    </div>
+
+    <div class="game-container">
+        <div class="score-board">
+            <div class="score-item">
+                <h3>🎯 점수</h3>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <h3>📊 레벨</h3>
+                <div class="score-value" id="level">1</div>
+            </div>
+            <div class="score-item">
+                <h3>⏱️ 생존 시간</h3>
+                <div class="score-value" id="survivalTimeDisplay">0초</div>
+            </div>
+            <div class="score-item">
+                <h3>💖 생명</h3>
+                <div class="score-value" id="lives">❤️❤️❤️</div>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <span id="gameInfo">마우스로 우주선을 조종해서 행성을 피하세요!</span>
+        </div>
+
+        <div class="game-area">
+            <div class="game-canvas" id="gameCanvas">
+                <div class="player" id="player">
+                    <div class="spaceship">
+                        <div class="ship-body"></div>
+                        <div class="ship-window"></div>
+                        <div class="ship-wing left"></div>
+                        <div class="ship-wing right"></div>
+                        <div class="ship-engine"></div>
+                        <div class="ship-flame"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="game-overlay" id="gameOverlay">
+                <div class="overlay-content">
+                    <div class="overlay-title" id="overlayTitle">🎮 게임 준비!</div>
+                    <div class="overlay-message" id="overlayMessage">클릭하거나 스페이스바를 눌러 게임을 시작하세요</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-info">
+            <div class="control-item">
+                <span class="key">마우스</span>
+                <span>우주선 조종</span>
+            </div>
+            <div class="control-item">
+                <span class="key">SPACE</span>
+                <span>게임 시작 / 일시정지</span>
+            </div>
+            <div class="control-item">
+                <span class="key">P</span>
+                <span>일시정지</span>
+            </div>
+            <div class="control-item">
+                <span class="key">R</span>
+                <span>게임 재시작</span>
+            </div>
+            <div class="control-item">
+                <span class="key">H</span>
+                <span>도움말</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" onclick="startGame()">🚀 게임 시작</button>
+            <button class="control-btn" onclick="pauseGame()">⏸️ 일시정지</button>
+            <button class="control-btn" onclick="resetGame()">🔄 게임 리셋</button>
+            <button class="control-btn" onclick="showHelp()">📋 도움말</button>
+            <button class="control-btn" onclick="showStats()">📊 통계 보기</button>
+            <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div>최고점수</div>
+                <div class="stat-value" id="highScore">0</div>
+            </div>
+            <div class="stat-item">
+                <div>생존율</div>
+                <div class="stat-value" id="survivalRate">0%</div>
+            </div>
+            <div class="stat-item">
+                <div>최고 레벨</div>
+                <div class="stat-value" id="bestLevel">1</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 오버 모달 -->
+    <div class="game-over-modal" id="gameOverModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">🚀 게임 완료!</h2>
+            <p id="modalMessage">우주 탐험을 완료했습니다!</p>
+            <div class="modal-score">
+                <div>최종 점수: <span id="finalScore">0</span></div>
+                <div>도달 레벨: <span id="finalLevel">1</span></div>
+                <div>생존 시간: <span id="survivalTime">0</span>초</div>
+            </div>
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeModal()">다시 하기</button>
+                <button class="control-btn" onclick="goHome()">메인으로</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 도움말 모달 -->
+    <div class="game-over-modal" id="helpModal">
+        <div class="modal-content help-modal">
+            <h2>📋 행성 피하기 도움말</h2>
+            
+            <div class="help-section">
+                <h3>🎮 게임 방법</h3>
+                <p>• 마우스를 움직여서 우주선을 조종합니다</p>
+                <p>• 다양한 방향에서 날아오는 행성들을 피하세요</p>
+                <p>• 행성과 충돌하면 생명이 감소합니다</p>
+                <p>• 시간이 지날수록 더 많은 행성이 나타납니다</p>
+            </div>
+
+            <div class="help-section">
+                <h3>🪐 행성 종류</h3>
+                <div class="planet-list">
+                    <div class="planet-item normal">
+                        <span class="planet-emoji">🪐</span>
+                        <div class="planet-info">
+                            <div class="planet-name">토성</div>
+                            <div class="planet-desc">보통 속도로 움직임</div>
+                        </div>
+                    </div>
+                    <div class="planet-item slow">
+                        <span class="planet-emoji">🌕</span>
+                        <div class="planet-info">
+                            <div class="planet-name">달</div>
+                            <div class="planet-desc">느린 속도로 움직임</div>
+                        </div>
+                    </div>
+                    <div class="planet-item fast">
+                        <span class="planet-emoji">⭐</span>
+                        <div class="planet-info">
+                            <div class="planet-name">별</div>
+                            <div class="planet-desc">빠른 속도로 움직임</div>
+                        </div>
+                    </div>
+                    <div class="planet-item fast">
+                        <span class="planet-emoji">🛸</span>
+                        <div class="planet-info">
+                            <div class="planet-name">UFO</div>
+                            <div class="planet-desc">빠른 속도로 움직임</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h3>💖 생명 시스템</h3>
+                <p>• 시작 시 생명 3개</p>
+                <p>• 행성과 충돌할 때마다 생명 1개 감소</p>
+                <p>• 모든 생명을 잃으면 게임 오버</p>
+                <p>• 10레벨마다 생명 1개 회복 (최대 3개)</p>
+            </div>
+
+            <div class="help-section">
+                <h3>🎯 점수 시스템</h3>
+                <p>• 1초마다 생존 점수 +1점</p>
+                <p>• 행성을 피할 때마다 +10점</p>
+                <p>• 레벨업 시 보너스 점수 +50점</p>
+            </div>
+
+            <div class="help-section">
+                <h3>📊 레벨 시스템</h3>
+                <p>• 500점마다 레벨업</p>
+                <p>• 레벨이 오를수록 행성이 더 많이 생성</p>
+                <p>• 레벨이 오를수록 행성 속도 증가</p>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeHelp()">✅ 확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 통계 모달 -->
+    <div class="game-over-modal" id="statsModal">
+        <div class="modal-content stats-modal">
+            <h2>📊 게임 통계</h2>
+            
+            <div class="help-section">
+                <h3>전체 통계</h3>
+                <div class="stats-grid">
+                    <div class="stat-row">
+                        <span class="stat-label">총 게임 수:</span>
+                        <span class="stat-value" id="modalTotalGames">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">최고 점수:</span>
+                        <span class="stat-value" id="modalHighScore">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">최고 생존 시간:</span>
+                        <span class="stat-value" id="modalBestTime">0초</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">최고 레벨:</span>
+                        <span class="stat-value" id="modalBestLevel">1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="control-btn reset-btn" onclick="resetStats()">🗑️ 모든 기록 삭제</button>
+                <button class="control-btn" onclick="closeStats()">✅ 확인</button>
+            </div>
+            
+            <div class="warning-text">⚠️ 삭제된 기록은 복구할 수 없습니다</div>
+        </div>
+    </div>
+
+    <script src="js/game10.js"></script>
+</body>
+</html>

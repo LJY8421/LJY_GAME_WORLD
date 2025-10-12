@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game7.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+    <title>LJY_GAME-폭탄찾기</title>
+</head>
+<body>
+<div class="header">
+    <h1>💣 폭탄찾기 💣</h1>
+    <p>숨겨진 폭탄을 찾아 모든 안전한 칸을 열어보세요!</p>
+</div>
+
+<div class="game-container">
+    <div class="score-board">
+        <div class="score-item">
+            <h3>⏱️ 시간</h3>
+            <div class="score-value" id="timer">000</div>
+        </div>
+        <div class="score-item">
+            <h3>💣 폭탄</h3>
+            <div class="score-value" id="minesLeft">10</div>
+        </div>
+        <div class="score-item">
+            <h3>🚩 깃발</h3>
+            <div class="score-value" id="flagsUsed">0</div>
+        </div>
+    </div>
+
+    <div class="game-info">
+        <span id="gameInfo">난이도를 선택하고 시작하세요!</span>
+    </div>
+
+    <div class="game-area">
+        <div id="gameBoard" class="game-board"></div>
+        <div class="game-overlay" id="gameOverlay">
+            <div class="overlay-content">
+                <div class="overlay-title" id="overlayTitle">🎯 난이도 선택!</div>
+                <div class="overlay-message" id="overlayMessage">
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn" onclick="selectDifficulty('easy')">
+                            <span>🟢 초급</span><br>
+                            <small>9×9, 10개 폭탄</small>
+                        </button>
+                        <button class="difficulty-btn" onclick="selectDifficulty('medium')">
+                            <span>🟡 중급</span><br>
+                            <small>16×16, 40개 폭탄</small>
+                        </button>
+                        <button class="difficulty-btn" onclick="selectDifficulty('hard')">
+                            <span>🔴 고급</span><br>
+                            <small>16×30, 99개 폭탄</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-info">
+        <div class="control-item">
+            <span class="key">클릭</span>
+            <span>칸 열기</span>
+        </div>
+        <div class="control-item">
+            <span class="key">우클릭</span>
+            <span>깃발 표시</span>
+        </div>
+        <div class="control-item">
+            <span class="key">SPACE</span>
+            <span>일시정지</span>
+        </div>
+        <div class="control-item">
+            <span class="key">H</span>
+            <span>도움말</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" onclick="startNewGame()">🚀 게임 시작</button>
+        <button class="control-btn" onclick="pauseGame()" id="pauseBtn">⏸️ 일시정지</button>
+        <button class="control-btn" onclick="resetGame()">🔄 게임 리셋</button>
+        <button class="control-btn" onclick="changeDifficulty()">⚙️ 난이도 변경</button>
+        <button class="control-btn" onclick="showHelp()">📋 도움말</button>
+        <button class="control-btn" onclick="showStats()">📊 통계 보기</button>
+        <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div>최고 기록</div>
+            <div class="stat-value" id="bestTime">999</div>
+        </div>
+        <div class="stat-item">
+            <div>게임 승률</div>
+            <div class="stat-value" id="winRate">0%</div>
+        </div>
+        <div class="stat-item">
+            <div>총 게임수</div>
+            <div class="stat-value" id="totalGames">0</div>
+        </div>
+    </div>
+</div>
+
+<!-- 게임 오버 모달 -->
+<div class="game-over-modal" id="gameOverModal">
+    <div class="modal-content">
+        <h2 id="modalTitle">🎉 게임 완료!</h2>
+        <p id="modalMessage">축하합니다! 모든 폭탄을 찾았습니다!</p>
+        <div class="modal-score">
+            <div>게임 시간: <span id="finalTime">000</span>초</div>
+            <div>난이도: <span id="finalDifficulty">중급</span></div>
+        </div>
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeModal()">다시 하기</button>
+            <button class="control-btn" onclick="goHome()">메인으로</button>
+        </div>
+    </div>
+</div>
+
+<!-- 도움말 모달 -->
+<div class="game-over-modal" id="helpModal">
+    <div class="modal-content help-modal">
+        <h2>📋 폭탄찾기 도움말</h2>
+        
+        <div class="help-section">
+            <h3>🎯 게임 목표</h3>
+            <p>모든 폭탄을 피해서 안전한 칸들을 모두 열어야 합니다.</p>
+            <p>폭탄을 클릭하면 게임이 종료됩니다.</p>
+        </div>
+        
+        <div class="help-section">
+            <h3>🎮 조작 방법</h3>
+            <div class="control-list">
+                <div class="control-row">
+                    <span class="control-key">좌클릭</span>
+                    <span>칸 열기</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">우클릭</span>
+                    <span>깃발 표시/해제</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">스페이스</span>
+                    <span>게임 일시정지/재개</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">R</span>
+                    <span>게임 리셋</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">H</span>
+                    <span>도움말 열기</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">ESC</span>
+                    <span>메인 화면으로</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h3>📊 난이도 설정</h3>
+            <div class="difficulty-list">
+                <div class="difficulty-row">
+                    <span class="difficulty-name">🟢 초급</span>
+                    <span>9×9, 10개 폭탄</span>
+                </div>
+                <div class="difficulty-row">
+                    <span class="difficulty-name">🟡 중급</span>
+                    <span>16×16, 40개 폭탄</span>
+                </div>
+                <div class="difficulty-row">
+                    <span class="difficulty-name">🔴 고급</span>
+                    <span>16×30, 99개 폭탄</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h3>🔢 숫자의 의미</h3>
+            <p>열린 칸에 표시되는 숫자는 그 칸 주변 8칸에 있는 폭탄의 개수를 나타냅니다.</p>
+            <div class="number-grid">
+                <div class="number-item">
+                    <span class="number-display number-1">1</span>
+                    <span>주변에 폭탄 1개</span>
+                </div>
+                <div class="number-item">
+                    <span class="number-display number-2">2</span>
+                    <span>주변에 폭탄 2개</span>
+                </div>
+                <div class="number-item">
+                    <span class="number-display number-3">3</span>
+                    <span>주변에 폭탄 3개</span>
+                </div>
+                <div class="number-item">
+                    <span class="number-display number-4">4</span>
+                    <span>주변에 폭탄 4개</span>
+                </div>
+                <div class="number-item">
+                    <span class="number-display number-5">5</span>
+                    <span>주변에 폭탄 5개</span>
+                </div>
+                <div class="number-item">
+                    <span class="number-display number-6">6</span>
+                    <span>주변에 폭탄 6개</span>
+                </div>
+                <div class="number-item">
+                    <span class="number-display number-7">7</span>
+                    <span>주변에 폭탄 7개</span>
+                </div>
+                <div class="number-item">
+                    <span class="number-display number-8">8</span>
+                    <span>주변에 폭탄 8개 (최대)</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h3>🚩 깃발 시스템</h3>
+            <div class="flag-list">
+                <div class="flag-item">
+                    <span class="flag-display flag-yellow">🚩</span>
+                    <div class="flag-info">
+                        <div class="flag-name">노란색 깃발</div>
+                        <div class="flag-desc">게임 중 표시한 깃발</div>
+                    </div>
+                </div>
+                <div class="flag-item">
+                    <span class="flag-display flag-green">🚩</span>
+                    <div class="flag-info">
+                        <div class="flag-name">초록색 깃발</div>
+                        <div class="flag-desc">게임 종료 시 올바르게 표시한 깃발</div>
+                    </div>
+                </div>
+                <div class="flag-item">
+                    <span class="flag-display flag-orange">🚩</span>
+                    <div class="flag-info">
+                        <div class="flag-name">주황색 깃발</div>
+                        <div class="flag-desc">게임 종료 시 잘못 표시한 깃발</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h3>💡 게임 팁</h3>
+            <div class="tip-item">
+                <strong>첫 클릭 안전:</strong> 첫 번째 클릭은 항상 안전합니다!
+            </div>
+            <div class="tip-item">
+                <strong>숫자 활용:</strong> 숫자를 보고 주변 폭탄 위치를 추측하세요.
+            </div>
+            <div class="tip-item">
+                <strong>깃발 활용:</strong> 폭탄이 있다고 확신하는 곳에 깃발을 꽂으세요.
+            </div>
+            <div class="tip-item">
+                <strong>패턴 인식:</strong> 1-2-1 같은 패턴을 익히면 더 쉽게 풀 수 있습니다.
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h3>📈 점수 시스템</h3>
+            <p>• 게임 완주 시간이 기록됩니다</p>
+            <p>• 난이도별로 최고 기록이 저장됩니다</p>
+            <p>• 전체 게임 승률이 계산됩니다</p>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeHelp()">✅ 확인</button>
+        </div>
+    </div>
+</div>
+
+<!-- 통계 모달 -->
+<div class="game-over-modal" id="statsModal">
+    <div class="modal-content stats-modal">
+        <h2>📊 게임 통계</h2>
+        
+        <div class="help-section">
+            <h3>전체 통계</h3>
+            <div class="stats-grid">
+                <div class="stat-row">
+                    <span class="stat-label">총 게임 수:</span>
+                    <span class="stat-value" id="modalTotalGames">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">승리한 게임:</span>
+                    <span class="stat-value" id="modalGamesWon">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">승률:</span>
+                    <span class="stat-value" id="modalWinRate">0%</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h3>난이도별 최고 기록</h3>
+            
+            <div class="difficulty-stats">
+                <div class="difficulty-stat-item">
+                    <div class="difficulty-header">
+                        <span class="difficulty-emoji">🟢</span>
+                        <span class="difficulty-title">초급 (9×9)</span>
+                    </div>
+                    <div class="difficulty-record">
+                        <span class="record-label">최고 기록:</span>
+                        <span class="record-value" id="modalBestEasy">기록 없음</span>
+                    </div>
+                </div>
+                
+                <div class="difficulty-stat-item">
+                    <div class="difficulty-header">
+                        <span class="difficulty-emoji">🟡</span>
+                        <span class="difficulty-title">중급 (16×16)</span>
+                    </div>
+                    <div class="difficulty-record">
+                        <span class="record-label">최고 기록:</span>
+                        <span class="record-value" id="modalBestMedium">기록 없음</span>
+                    </div>
+                </div>
+                
+                <div class="difficulty-stat-item">
+                    <div class="difficulty-header">
+                        <span class="difficulty-emoji">🔴</span>
+                        <span class="difficulty-title">고급 (16×30)</span>
+                    </div>
+                    <div class="difficulty-record">
+                        <span class="record-label">최고 기록:</span>
+                        <span class="record-value" id="modalBestHard">기록 없음</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn reset-btn" onclick="resetStats()">🗑️ 모든 기록 삭제</button>
+            <button class="control-btn" onclick="closeStats()">✅ 확인</button>
+        </div>
+        
+        <div class="warning-text">⚠️ 삭제된 기록은 복구할 수 없습니다</div>
+    </div>
+</div>
+
+<script src="js/game7.js"></script>
+</body>
+</html>

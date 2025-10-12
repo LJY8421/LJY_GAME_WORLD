@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game2.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+    <title>LJY_GAME-벽돌깨기</title>
+</head>
+<body>
+<div class="header">
+    <h1>🧱 벽돌깨기 🧱</h1>
+    <p>모든 벽돌을 부수고 우주 최강이 되어보세요!</p>
+</div>
+
+<div class="game-container">
+    <div class="score-board">
+        <div class="score-item">
+            <h3>🎯 점수</h3>
+            <div class="score-value" id="score">0</div>
+        </div>
+        <div class="score-item">
+            <h3>❤️ 생명</h3>
+            <div class="score-value" id="lives">3</div>
+        </div>
+        <div class="score-item">
+            <h3>📊 레벨</h3>
+            <div class="score-value" id="level">1</div>
+        </div>
+    </div>
+
+    <div class="game-info">
+        <span id="gameInfo">스페이스바를 눌러 시작하세요!</span>
+    </div>
+
+    <div class="game-area">
+        <canvas id="gameCanvas" width="800" height="500"></canvas>
+        <div class="game-overlay" id="gameOverlay">
+            <div class="overlay-content">
+                <div class="overlay-title" id="overlayTitle">🎮 게임 준비!</div>
+                <div class="overlay-message" id="overlayMessage">스페이스바를 눌러 공을 발사하세요</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-info">
+        <div class="control-item">
+            <span class="key">←→</span>
+            <span>패들 이동</span>
+        </div>
+        <div class="control-item">
+            <span class="key">SPACE</span>
+            <span>공 발사 / 일시정지</span>
+        </div>
+        <div class="control-item">
+            <span class="key">R</span>
+            <span>게임 재시작</span>
+        </div>
+        <div class="control-item">
+            <span class="key">H</span>
+            <span>도움말</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" onclick="startGame()">🚀 게임 시작</button>
+        <button class="control-btn" onclick="pauseGame()">⏸️ 일시정지</button>
+        <button class="control-btn" onclick="resetGame()">🔄 게임 리셋</button>
+        <button class="control-btn" onclick="showHelp()">📋 도움말</button>
+        <button class="control-btn" onclick="showStats()">📊 통계 보기</button>
+        <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div>최고점수</div>
+            <div class="stat-value" id="highScore">0</div>
+        </div>
+        <div class="stat-item">
+            <div>남은 벽돌</div>
+            <div class="stat-value" id="bricksLeft">0</div>
+        </div>
+        <div class="stat-item">
+            <div>연속 히트</div>
+            <div class="stat-value" id="combo">0</div>
+        </div>
+    </div>
+</div>
+
+<!-- 게임 오버 모달 -->
+<div class="game-over-modal" id="gameOverModal">
+    <div class="modal-content">
+        <h2 id="modalTitle">🎉 게임 완료!</h2>
+        <p id="modalMessage">축하합니다! 모든 벽돌을 부쉈습니다!</p>
+        <div class="modal-score">
+            <div>최종 점수: <span id="finalScore">0</span></div>
+            <div>도달 레벨: <span id="finalLevel">1</span></div>
+        </div>
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeModal()">다시 하기</button>
+            <button class="control-btn" onclick="goHome()">메인으로</button>
+        </div>
+    </div>
+</div>
+
+<!-- 도움말 모달 -->
+<div class="game-over-modal" id="helpModal">
+    <div class="modal-content help-modal">
+        <h2>📋 벽돌깨기 도움말</h2>
+        
+        <div class="help-section">
+            <h3>🎮 게임 목표</h3>
+            <p>• 패들을 조작하여 공을 벽돌에 맞춰 모든 벽돌을 부수세요</p>
+            <p>• 공이 바닥에 떨어지지 않도록 주의하세요</p>
+            <p>• 모든 벽돌을 부수면 다음 레벨로 진행됩니다</p>
+        </div>
+
+        <div class="help-section">
+            <h3>🕹️ 조작법</h3>
+            <div class="control-help-grid">
+                <div class="control-help-item">
+                    <span class="help-key">←→ 방향키</span>
+                    <span>패들을 좌우로 이동</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">마우스</span>
+                    <span>마우스로 패들 위치 조정</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">스페이스바</span>
+                    <span>공 발사 / 게임 일시정지</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">R키</span>
+                    <span>게임 재시작</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">H키</span>
+                    <span>도움말 열기</span>
+                </div>
+                <div class="control-help-item">
+                    <span class="help-key">ESC키</span>
+                    <span>메인 메뉴로 이동</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>🎯 기본 벽돌 점수</h3>
+            <div class="scoring-grid">
+                <div class="scoring-item red">
+                    <div class="brick-color red-brick"></div>
+                    <div class="brick-info">
+                        <div class="brick-name">빨간 벽돌 (1번째 줄)</div>
+                        <div class="brick-score">35점</div>
+                    </div>
+                </div>
+                <div class="scoring-item orange">
+                    <div class="brick-color orange-brick"></div>
+                    <div class="brick-info">
+                        <div class="brick-name">주황 벽돌 (2번째 줄)</div>
+                        <div class="brick-score">30점</div>
+                    </div>
+                </div>
+                <div class="scoring-item yellow">
+                    <div class="brick-color yellow-brick"></div>
+                    <div class="brick-info">
+                        <div class="brick-name">노란 벽돌 (3번째 줄)</div>
+                        <div class="brick-score">25점</div>
+                    </div>
+                </div>
+                <div class="scoring-item green">
+                    <div class="brick-color green-brick"></div>
+                    <div class="brick-info">
+                        <div class="brick-name">초록 벽돌 (4번째 줄)</div>
+                        <div class="brick-score">20점</div>
+                    </div>
+                </div>
+                <div class="scoring-item blue">
+                    <div class="brick-color blue-brick"></div>
+                    <div class="brick-info">
+                        <div class="brick-name">파란 벽돌 (5번째 줄)</div>
+                        <div class="brick-score">15점</div>
+                    </div>
+                </div>
+                <div class="scoring-item purple">
+                    <div class="brick-color purple-brick"></div>
+                    <div class="brick-info">
+                        <div class="brick-name">보라 벽돌 (6번째 줄)</div>
+                        <div class="brick-score">10점</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>✨ 특수 벽돌 (레벨별 등장)</h3>
+            <div class="scoring-grid">
+                <div class="scoring-item pink">
+                    <div class="brick-color pink-brick"></div>
+                    <div class="brick-info">
+                        <div class="brick-name">분홍 벽돌 (레벨 7+)</div>
+                        <div class="brick-score">30점</div>
+                        <div class="brick-special">벽돌 파괴시 생성</div>
+                    </div>
+                </div>
+                <div class="scoring-item black">
+                    <div class="brick-color black-brick"></div>
+                    <div class="brick-info">
+                        <div class="brick-name">검정 벽돌 (레벨 10+)</div>
+                        <div class="brick-score">40점</div>
+                        <div class="brick-special">사라졌다가 다시 나타남</div>
+                    </div>
+                </div>
+                <div class="scoring-item brown">
+                    <div class="brick-color brown-brick"></div>
+                    <div class="brick-info">
+                        <div class="brick-name">갈색 벽돌 (레벨 12+)</div>
+                        <div class="brick-score">45점</div>
+                        <div class="brick-special">5번 타격, 공 크기 증가</div>
+                    </div>
+                </div>
+                <div class="scoring-item rainbow">
+                    <div class="brick-color rainbow-brick"></div>
+                    <div class="brick-info">
+                        <div class="brick-name">무지개 벽돌 (레벨 15+)</div>
+                        <div class="brick-score">50점</div>
+                        <div class="brick-special">10번 타격, 패들 확장</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>🎁 아이템 시스템</h3>
+            <p>• <strong>멀티볼 아이템 (레벨 3+):</strong> 일반 벽돌 파괴 시 30% 확률로 추가 공 생성 (최대 5개)</p>
+            <p>• <strong>공 크기 증가:</strong> 갈색 벽돌 파괴시 모든 공이 커짐 (15초간)</p>
+            <p>• <strong>패들 확장:</strong> 무지개 벽돌 파괴시 패들이 60% 크기로 확장 (10초간)</p>
+        </div>
+
+        <div class="help-section">
+            <h3>💎 보너스 시스템</h3>
+            <p>• <strong>콤보 보너스:</strong> 연속으로 벽돌을 맞추면 콤보 × 5점 추가</p>
+            <p>• <strong>레벨 완료 보너스:</strong> 남은 생명 × 100점 + 최대 콤보 × 50점</p>
+            <p>• <strong>패들 각도:</strong> 패들의 어느 부분에 맞는지에 따라 공의 각도가 바뀝니다</p>
+            <p>• <strong>생명 보너스:</strong> 레벨 10마다 생명 1개씩 지급합니다</p>
+        </div>
+
+        <div class="help-section">
+            <h3>⚡ 게임 진행</h3>
+            <p>• 시작 시 생명 3개</p>
+            <p>• 공이 바닥에 떨어지면 생명 1개 감소</p>
+            <p>• 모든 생명을 잃으면 게임 오버</p>
+            <p>• 레벨 5부터 공의 속도가 점점 빨라집니다 (최대 6.0)</p>
+            <p>• 레벨이 높아질수록 더 많은 특수 벽돌이 등장합니다</p>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeHelp()">✅ 확인</button>
+        </div>
+    </div>
+</div>
+
+<!-- 통계 모달 -->
+<div class="game-over-modal" id="statsModal">
+    <div class="modal-content stats-modal">
+        <h2>📊 게임 통계</h2>
+        
+        <div class="help-section">
+            <h3>🏆 개인 기록</h3>
+            <div class="stats-grid">
+                <div class="stat-row">
+                    <span class="stat-label">최고 점수:</span>
+                    <span class="stat-value highlight" id="modalHighScore">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최고 레벨:</span>
+                    <span class="stat-value highlight" id="modalBestLevel">1</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최대 콤보:</span>
+                    <span class="stat-value highlight" id="modalMaxCombo">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>📈 전체 통계</h3>
+            <div class="stats-grid">
+                <div class="stat-row">
+                    <span class="stat-label">총 게임 수:</span>
+                    <span class="stat-value" id="modalTotalGames">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">완료한 게임:</span>
+                    <span class="stat-value" id="modalGamesCompleted">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">총 벽돌 파괴:</span>
+                    <span class="stat-value" id="modalTotalBricks">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">총 플레이 시간:</span>
+                    <span class="stat-value" id="modalPlayTime">0분</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">평균 점수:</span>
+                    <span class="stat-value" id="modalAvgScore">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn reset-btn" onclick="resetStats()">🗑️ 모든 기록 삭제</button>
+            <button class="control-btn" onclick="closeStats()">✅ 확인</button>
+        </div>
+        
+        <div class="warning-text">⚠️ 삭제된 기록은 복구할 수 없습니다</div>
+    </div>
+</div>
+
+</body>
+<script src="js/game2.js"></script>
+</html>

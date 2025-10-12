@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game6.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+    <title>LJY_GAME-숫자맞추기</title>
+</head>
+<body>
+<div class="header">
+    <h1>💯 숫자맞추기 ❓</h1>
+    <p>숨겨진 숫자를 추리해서 우주 최고의 탐정이 되어보세요!</p>
+</div>
+
+<div class="game-container">
+    <div class="score-board">
+        <div class="score-item">
+            <h3>🎯 점수</h3>
+            <div class="score-value" id="score">0</div>
+        </div>
+        <div class="score-item">
+            <h3>🎲 라운드</h3>
+            <div class="score-value" id="round">1</div>
+        </div>
+        <div class="score-item">
+            <h3>⏱️ 시간</h3>
+            <div class="score-value" id="timeLeft">60</div>
+        </div>
+    </div>
+
+    <div class="game-info">
+        <span id="gameInfo">1부터 100 사이의 숫자를 맞춰보세요!</span>
+    </div>
+
+    <div class="game-area">
+        <div class="game-board" id="gameBoard">
+            <div class="number-display">
+                <div class="mystery-number" id="mysteryNumber">❓❓❓</div>
+                <div class="range-info" id="rangeInfo">1 ~ 100</div>
+            </div>
+            
+            <div class="input-section">
+                <div class="input-container">
+                    <input type="number" id="guessInput" min="1" max="100" placeholder="숫자 입력">
+                    <div class="custom-spinner">
+                        <button class="spinner-btn spinner-up" onclick="incrementValue()"></button>
+                        <button class="spinner-btn spinner-down" onclick="decrementValue()"></button>
+                    </div>
+                </div>
+                <button class="guess-btn" id="guessBtn" onclick="makeGuess()">🚀 추측!</button>
+            </div>
+
+            <div class="hint-section">
+                <div class="hint-text" id="hintText">힌트가 여기에 표시됩니다</div>
+                <div class="attempts-info" id="attemptsInfo">시도 횟수: 0/7</div>
+            </div>
+
+            <div class="history-section">
+                <h3>🔍 추측 기록</h3>
+                <div class="guess-history" id="guessHistory">
+                    <!-- 추측 기록이 여기에 동적으로 추가됩니다 -->
+                </div>
+            </div>
+        </div>
+
+        <div class="game-overlay hidden" id="gameOverlay">
+            <div class="overlay-content">
+                <div class="overlay-title" id="overlayTitle">🎮 게임 준비!</div>
+                <div class="overlay-message" id="overlayMessage">준비되면 시작 버튼을 눌러주세요</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-info">
+        <div class="control-item">
+            <span class="key">1-100</span>
+            <span>숫자 입력</span>
+        </div>
+        <div class="control-item">
+            <span class="key">ENTER</span>
+            <span>추측하기</span>
+        </div>
+        <div class="control-item">
+            <span class="key">SPACE</span>
+            <span>시작/일시정지</span>
+        </div>
+        <div class="control-item">
+            <span class="key">R</span>
+            <span>게임 재시작</span>
+        </div>
+        <div class="control-item">
+            <span class="key">H</span>
+            <span>도움말</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" onclick="startGame()">🚀 게임 시작</button>
+        <button class="control-btn" onclick="pauseGame()">⏸️ 일시정지</button>
+        <button class="control-btn" onclick="resetGame()">🔄 게임 리셋</button>
+        <button class="control-btn" onclick="showHelp()">📋 도움말</button>
+        <button class="control-btn" onclick="showStats()">📊 통계 보기</button>
+        <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div>최고점수</div>
+            <div class="stat-value" id="highScore">0</div>
+        </div>
+        <div class="stat-item">
+            <div>총 라운드</div>
+            <div class="stat-value" id="totalRounds">0</div>
+        </div>
+        <div class="stat-item">
+            <div>정확도</div>
+            <div class="stat-value" id="accuracy">0%</div>
+        </div>
+    </div>
+</div>
+
+<!-- 게임 오버 모달 -->
+<div class="game-over-modal" id="gameOverModal">
+    <div class="modal-content">
+        <h2 id="modalTitle">🎉 라운드 완료!</h2>
+        <p id="modalMessage">축하합니다! 숫자를 맞추셨습니다!</p>
+        <div class="modal-score">
+            <div>최종 점수: <span id="finalScore">0</span></div>
+            <div>완료 라운드: <span id="finalRounds">0</span></div>
+            <div>평균 시도 횟수: <span id="averageAttempts">0</span></div>
+        </div>
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeModal()">다시 하기</button>
+            <button class="control-btn" onclick="goHome()">메인으로</button>
+        </div>
+    </div>
+</div>
+
+<!-- 도움말 모달 -->
+<div class="game-over-modal" id="helpModal">
+    <div class="modal-content help-modal">
+        <h2>📋 게임 도움말</h2>
+        
+        <div class="help-section">
+            <h3>🎮 게임 방법</h3>
+            <div class="control-list">
+                <div class="control-row">
+                    <span class="control-key">숫자 입력</span>
+                    <span>1부터 100 사이의 숫자를 입력하세요</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">엔터 키</span>
+                    <span>추측 실행 (또는 추측 버튼 클릭)</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">스페이스바</span>
+                    <span>게임 시작 / 일시정지</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">R키</span>
+                    <span>게임 재시작</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">H키</span>
+                    <span>도움말 열기</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-key">ESC키</span>
+                    <span>메인으로 돌아가기</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>🎯 게임 규칙</h3>
+            <p>• 컴퓨터가 1부터 100 사이의 숫자를 하나 선택합니다</p>
+            <p>• 7번의 기회 안에 그 숫자를 맞춰야 합니다</p>
+            <p>• 각 라운드는 60초 제한시간이 있습니다</p>
+            <p>• 같은 숫자를 두 번 추측할 수 없습니다</p>
+            <p>• 힌트를 보고 범위를 좁혀가며 추측하세요</p>
+        </div>
+
+        <div class="help-section">
+            <h3>💡 힌트 시스템</h3>
+            <div class="hint-list">
+                <div class="hint-item close">
+                    <span class="hint-icon">🔥</span>
+                    <div class="hint-info">
+                        <div class="hint-name">거의 다 왔어요!</div>
+                        <div class="hint-desc">추측한 숫자와 정답의 차이가 5 이하</div>
+                    </div>
+                </div>
+                <div class="hint-item near">
+                    <span class="hint-icon">🌟</span>
+                    <div class="hint-info">
+                        <div class="hint-name">가까워요!</div>
+                        <div class="hint-desc">추측한 숫자와 정답의 차이가 6~10</div>
+                    </div>
+                </div>
+                <div class="hint-item medium">
+                    <span class="hint-icon">👆</span>
+                    <div class="hint-info">
+                        <div class="hint-name">더 크거나 작은 수</div>
+                        <div class="hint-desc">추측한 숫자와 정답의 차이가 11~20</div>
+                    </div>
+                </div>
+                <div class="hint-item far">
+                    <span class="hint-icon">⬆️</span>
+                    <div class="hint-info">
+                        <div class="hint-name">훨씬 크거나 작은 수</div>
+                        <div class="hint-desc">추측한 숫자와 정답의 차이가 21 이상</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>🏆 점수 계산</h3>
+            <p>• 기본 점수: 100점</p>
+            <p>• 시간 보너스: 남은 시간 × 2점</p>
+            <p>• 시도 보너스: (8 - 시도 횟수) × 10점</p>
+            <p>• 빠르고 적은 시도로 맞출수록 높은 점수!</p>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn" onclick="closeHelp()">✅ 확인</button>
+        </div>
+    </div>
+</div>
+
+<!-- 통계 모달 -->
+<div class="game-over-modal" id="statsModal">
+    <div class="modal-content stats-modal">
+        <h2>📊 게임 통계</h2>
+        
+        <div class="help-section">
+            <h3>전체 통계</h3>
+            <div class="stats-grid">
+                <div class="stat-row">
+                    <span class="stat-label">총 게임 수:</span>
+                    <span class="stat-value" id="modalTotalGames">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">총 라운드 수:</span>
+                    <span class="stat-value" id="modalTotalRounds">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">성공한 라운드:</span>
+                    <span class="stat-value" id="modalSuccessRounds">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최고 점수:</span>
+                    <span class="stat-value" id="modalHighScore">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">최고 라운드:</span>
+                    <span class="stat-value" id="modalBestRound">1</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">평균 시도 횟수:</span>
+                    <span class="stat-value" id="modalAvgAttempts">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">성공률:</span>
+                    <span class="stat-value" id="modalSuccessRate">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="control-btn reset-btn" onclick="resetStats()">🗑️ 모든 기록 삭제</button>
+            <button class="control-btn" onclick="closeStats()">✅ 확인</button>
+        </div>
+        
+        <div class="warning-text">⚠️ 삭제된 기록은 복구할 수 없습니다</div>
+    </div>
+</div>
+
+</body>
+<script src="js/game6.js"></script>
+</html>

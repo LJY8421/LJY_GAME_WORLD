@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LJY_GAME-스도쿠</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game11.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+</head>
+<body>
+    <div class="header">
+        <h1>🧩 스도쿠 🧩</h1>
+        <p>논리적 사고로 9x9 퍼즐을 완성하세요!</p>
+    </div>
+
+    <div class="game-container">
+        <div class="score-board">
+            <div class="score-item">
+                <h3>🎯 난이도</h3>
+                <div class="score-value" id="difficulty">-</div>
+            </div>
+            <div class="score-item">
+                <h3>⏱️ 시간</h3>
+                <div class="score-value" id="gameTime">00:00</div>
+            </div>
+            <div class="score-item">
+                <h3>❤️ 생명</h3>
+                <div class="score-value" id="lives">3</div>
+            </div>
+            <div class="score-item">
+                <h3>💡 힌트</h3>
+                <div class="score-value" id="hintsLeft">3</div>
+            </div>
+            <div class="score-item">
+                <h3>🏆 최고기록</h3>
+                <div class="score-value" id="bestTime">-</div>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <span id="gameInfo">난이도를 선택하고 시작하세요!</span>
+        </div>
+
+        <!-- 게임 영역과 숫자패드를 가로로 배치 -->
+        <div class="game-area-container">
+            <div class="game-area">
+                <div id="sudokuBoard" class="sudoku-board"></div>
+                <div class="game-overlay" id="gameOverlay">
+                    <div class="overlay-content">
+                        <div class="overlay-title" id="overlayTitle">🎯 난이도 선택!</div>
+                        <div class="overlay-message" id="overlayMessage">
+                            <div class="difficulty-buttons">
+                                <button class="difficulty-btn" onclick="selectDifficulty('easy')">
+                                    <span>🟢 초급</span><br>
+                                    <small>쉬운 퍼즐 (40-45개 힌트)</small>
+                                </button>
+                                <button class="difficulty-btn" onclick="selectDifficulty('medium')">
+                                    <span>🟡 중급</span><br>
+                                    <small>보통 퍼즐 (35-39개 힌트)</small>
+                                </button>
+                                <button class="difficulty-btn" onclick="selectDifficulty('hard')">
+                                    <span>🟠 고급</span><br>
+                                    <small>어려운 퍼즐 (30-34개 힌트)</small>
+                                </button>
+                                <button class="difficulty-btn" onclick="selectDifficulty('expert')">
+                                    <span>🔴 최고급</span><br>
+                                    <small>매우 어려운 퍼즐 (25-29개 힌트)</small>
+                                </button>
+                                <button class="difficulty-btn" onclick="selectDifficulty('extreme')">
+                                    <span>⚫ 극한</span><br>
+                                    <small>전문가용 퍼즐 (20-24개 힌트)</small>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 숫자패드 섹션 -->
+            <div class="number-pad-section">
+                <!-- 데스크톱용 숫자패드 -->
+                <div class="number-pad desktop-only" id="numberPad">
+                    <button class="number-btn" onclick="inputNumber(1)">1</button>
+                    <button class="number-btn" onclick="inputNumber(2)">2</button>
+                    <button class="number-btn" onclick="inputNumber(3)">3</button>
+                    <button class="number-btn" onclick="inputNumber(4)">4</button>
+                    <button class="number-btn" onclick="inputNumber(5)">5</button>
+                    <button class="number-btn" onclick="inputNumber(6)">6</button>
+                    <button class="number-btn" onclick="inputNumber(7)">7</button>
+                    <button class="number-btn" onclick="inputNumber(8)">8</button>
+                    <button class="number-btn" onclick="inputNumber(9)">9</button>
+                    <button class="number-btn hint-btn" onclick="getHint()">💡 힌트</button>
+                </div>
+                
+                <!-- 모바일용 입력 -->
+                <div class="mobile-input mobile-only">
+                    <input type="number" id="mobileInput" min="1" max="9" placeholder="숫자 입력">
+                    <button class="mobile-hint-btn" onclick="getHint()">💡 힌트 사용</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-info">
+            <div class="control-item desktop-only">
+                <span class="key">클릭</span>
+                <span>셀 선택</span>
+            </div>
+            <div class="control-item mobile-only">
+                <span class="key">터치</span>
+                <span>셀 선택 후 숫자 입력</span>
+            </div>
+            <div class="control-item desktop-only">
+                <span class="key">숫자키 1-9</span>
+                <span>숫자 입력</span>
+            </div>
+            <div class="control-item">
+                <span class="key">SPACE</span>
+                <span>일시정지</span>
+            </div>
+            <div class="control-item desktop-only">
+                <span class="key">DELETE</span>
+                <span>셀 지우기</span>
+            </div>
+            <div class="control-item">
+                <span class="key">H</span>
+                <span>도움말</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" onclick="startGame()">🚀 게임 시작</button>
+            <button class="control-btn" onclick="pauseGame()" id="pauseBtn">⏸️ 일시정지</button>
+            <button class="control-btn" onclick="resetGame()">🔄 게임 리셋</button>
+            <button class="control-btn" onclick="changeDifficulty()">⚙️ 난이도 변경</button>
+            <button class="control-btn" onclick="showHelp()">📋 도움말</button>
+            <button class="control-btn" onclick="showStats()">📊 통계 보기</button>
+            <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div>총 완료</div>
+                <div class="stat-value" id="totalCompleted">0</div>
+            </div>
+            <div class="stat-item">
+                <div>평균 시간</div>
+                <div class="stat-value" id="avgTime">-</div>
+            </div>
+            <div class="stat-item">
+                <div>완료율</div>
+                <div class="stat-value" id="completionRate">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 완료 모달 -->
+    <div class="game-over-modal" id="completeModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">🧩 퍼즐 완료!</h2>
+            <p id="modalMessage">축하합니다! 퍼즐을 성공적으로 완성했습니다!</p>
+            <div class="modal-score">
+                <div>완료 시간: <span id="finalTime">00:00</span></div>
+                <div>난이도: <span id="finalDifficulty">초급</span></div>
+                <div>사용한 힌트: <span id="usedHints">0</span></div>
+                <div>남은 생명: <span id="remainingLives">3</span></div>
+                <div id="recordMessage" class="record-message"></div>
+            </div>
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="restartGame()">🔄 다시 하기</button>
+                <button class="control-btn" onclick="selectNewDifficulty()">⚙️ 난이도 변경</button>
+                <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 오버 모달 -->
+    <div class="game-over-modal" id="gameOverModal">
+        <div class="modal-content">
+            <h2>💀 게임 오버</h2>
+            <p>생명을 모두 잃었습니다. 다시 도전해보세요!</p>
+            <div class="modal-score">
+                <div>플레이 시간: <span id="gameOverTime">00:00</span></div>
+                <div>난이도: <span id="gameOverDifficulty">초급</span></div>
+                <div>사용한 힌트: <span id="gameOverHints">0</span></div>
+            </div>
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeGameOver()">🔄 다시 하기</button>
+                <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 도움말 모달 -->
+    <div class="game-over-modal" id="helpModal">
+        <div class="modal-content help-modal">
+            <h2>📋 스도쿠 게임 도움말</h2>
+            
+            <div class="help-section">
+                <h3>🎮 게임 규칙</h3>
+                <p>• 9x9 격자에 1부터 9까지의 숫자를 채워넣는 퍼즐입니다</p>
+                <p>• 각 행, 열, 3x3 박스에 1~9가 한 번씩만 들어가야 합니다</p>
+                <p>• 주어진 숫자(초록색)는 변경할 수 없습니다</p>
+                <p>• 잘못된 숫자 입력 시 생명이 감소합니다</p>
+                <p>• 생명이 모두 소진되면 게임 오버입니다</p>
+            </div>
+
+            <div class="help-section">
+                <h3>🎯 조작 방법</h3>
+                <div class="control-list">
+                    <div class="control-row">
+                        <span class="control-key">마우스 클릭/터치</span>
+                        <span>셀 선택</span>
+                    </div>
+                    <div class="control-row desktop-only">
+                        <span class="control-key">숫자키 1-9</span>
+                        <span>숫자 입력</span>
+                    </div>
+                    <div class="control-row mobile-only">
+                        <span class="control-key">숫자 입력창</span>
+                        <span>선택된 셀에 숫자 입력</span>
+                    </div>
+                    <div class="control-row desktop-only">
+                        <span class="control-key">DELETE/BACKSPACE</span>
+                        <span>셀 지우기</span>
+                    </div>
+                    <div class="control-row mobile-only">
+                        <span class="control-key">지우기 버튼</span>
+                        <span>셀 지우기</span>
+                    </div>
+                    <div class="control-row desktop-only">
+                        <span class="control-key">화살표 키</span>
+                        <span>셀 이동</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">H키</span>
+                        <span>힌트 사용</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">스페이스바</span>
+                        <span>게임 시작/일시정지</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">ESC키</span>
+                        <span>메인으로 돌아가기</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h3>⭐ 난이도별 설정</h3>
+                <div class="difficulty-info">
+                    <div class="difficulty-row easy">
+                        <span class="difficulty-label">🟢 초급</span>
+                        <span class="difficulty-details">생명 3개 | 힌트 3개 | 35-38개 숫자 제공</span>
+                    </div>
+                    <div class="difficulty-row medium">
+                        <span class="difficulty-label">🟡 중급</span>
+                        <span class="difficulty-details">생명 3개 | 힌트 2개 | 31-34개 숫자 제공</span>
+                    </div>
+                    <div class="difficulty-row hard">
+                        <span class="difficulty-label">🟠 고급</span>
+                        <span class="difficulty-details">생명 3개 | 힌트 1개 | 27-30개 숫자 제공</span>
+                    </div>
+                    <div class="difficulty-row expert">
+                        <span class="difficulty-label">🔴 최고급</span>
+                        <span class="difficulty-details">생명 2개 | 힌트 1개 | 23-26개 숫자 제공</span>
+                    </div>
+                    <div class="difficulty-row extreme">
+                        <span class="difficulty-label">🟣 극한급</span>
+                        <span class="difficulty-details">생명 2개 | 힌트 0개 | 19-22개 숫자 제공</span>
+                    </div>
+                    <div class="difficulty-row transcendent">
+                        <span class="difficulty-label">⚫ 초월급</span>
+                        <span class="difficulty-details">생명 1개 | 힌트 0개 | 15-18개 숫자 제공</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h3>💡 게임 팁</h3>
+                <p>• 각 3x3 박스가 다른 색으로 구분되어 있습니다</p>
+                <p>• 노란색 테두리는 3x3 박스의 경계를 나타냅니다</p>
+                <p>• 오류가 있는 셀은 빨간색으로 표시됩니다</p>
+                <p>• 힌트는 신중하게 사용하세요 (제한적입니다)</p>
+                <p>• 논리적 추론을 통해 단계별로 해결하세요</p>
+                <p>• 막힐 때는 다른 행/열/박스를 확인해보세요</p>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeHelp()">✅ 확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 통계 모달 -->
+    <div class="game-over-modal" id="statsModal">
+        <div class="modal-content stats-modal">
+            <h2>📊 스도쿠 통계</h2>
+            
+            <div class="help-section">
+                <h3>전체 통계</h3>
+                <div class="stats-grid">
+                    <div class="stat-row">
+                        <span class="stat-label">총 시작한 게임:</span>
+                        <span class="stat-value" id="modalTotalGames">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">완료한 퍼즐:</span>
+                        <span class="stat-value" id="modalTotalCompleted">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">총 플레이 시간:</span>
+                        <span class="stat-value" id="modalTotalPlayTime">0시간 0분</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">평균 완료 시간:</span>
+                        <span class="stat-value" id="modalAvgTime">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">사용한 총 힌트:</span>
+                        <span class="stat-value" id="modalTotalHints">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">완료율:</span>
+                        <span class="stat-value" id="modalCompletionRate">0%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <h3>난이도별 최고 기록</h3>
+                <div class="difficulty-stats">
+                    <div class="difficulty-stat-item">
+                        <div class="difficulty-header">
+                            <span class="difficulty-emoji">🟢</span>
+                            <span class="difficulty-title">초급</span>
+                        </div>
+                        <div class="difficulty-record">
+                            <span class="record-label">최고 기록:</span>
+                            <span class="record-value" id="bestEasy">기록 없음</span>
+                        </div>
+                    </div>
+                    
+                    <div class="difficulty-stat-item">
+                        <div class="difficulty-header">
+                            <span class="difficulty-emoji">🟡</span>
+                            <span class="difficulty-title">중급</span>
+                        </div>
+                        <div class="difficulty-record">
+                            <span class="record-label">최고 기록:</span>
+                            <span class="record-value" id="bestMedium">기록 없음</span>
+                        </div>
+                    </div>
+                    
+                    <div class="difficulty-stat-item">
+                        <div class="difficulty-header">
+                            <span class="difficulty-emoji">🟠</span>
+                            <span class="difficulty-title">고급</span>
+                        </div>
+                        <div class="difficulty-record">
+                            <span class="record-label">최고 기록:</span>
+                            <span class="record-value" id="bestHard">기록 없음</span>
+                        </div>
+                    </div>
+                    
+                    <div class="difficulty-stat-item">
+                        <div class="difficulty-header">
+                            <span class="difficulty-emoji">🔴</span>
+                            <span class="difficulty-title">최고급</span>
+                        </div>
+                        <div class="difficulty-record">
+                            <span class="record-label">최고 기록:</span>
+                            <span class="record-value" id="bestExpert">기록 없음</span>
+                        </div>
+                    </div>
+                    
+                    <div class="difficulty-stat-item">
+                        <div class="difficulty-header">
+                            <span class="difficulty-emoji">🟣</span>
+                            <span class="difficulty-title">극한급</span>
+                        </div>
+                        <div class="difficulty-record">
+                            <span class="record-label">최고 기록:</span>
+                            <span class="record-value" id="bestExtreme">기록 없음</span>
+                        </div>
+                    </div>
+                    
+                    <div class="difficulty-stat-item">
+                        <div class="difficulty-header">
+                            <span class="difficulty-emoji">⚫</span>
+                            <span class="difficulty-title">초월급</span>
+                        </div>
+                        <div class="difficulty-record">
+                            <span class="record-label">최고 기록:</span>
+                            <span class="record-value" id="bestTranscendent">기록 없음</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="control-btn reset-btn" onclick="resetStats()">🗑️ 모든 기록 삭제</button>
+                <button class="control-btn" onclick="closeStats()">✅ 확인</button>
+            </div>
+            
+            <div class="warning-text">⚠️ 삭제된 기록은 복구할 수 없습니다</div>
+        </div>
+    </div>
+
+    <script src="js/game11.js"></script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game5.css">
+    <link rel="icon" href="images/game-controller.svg" type="image/svg+xml">
+    <title>LJY_GAME-반응속도</title>
+</head>
+<body>
+    <div class="header">
+        <h1>⚡ 반응속도 ⚡</h1>
+        <p>번개처럼 빠른 반응속도로 우주 최고의 반응왕이 되어보세요!</p>
+    </div>
+
+    <div class="game-container">
+        <div class="score-board">
+            <div class="score-item">
+                <h3>⚡ 최고기록</h3>
+                <div class="score-value" id="bestTime">-</div>
+            </div>
+            <div class="score-item">
+                <h3>⏰ 평균시간</h3>
+                <div class="score-value" id="avgTime">-</div>
+            </div>
+            <div class="score-item">
+                <h3>🏆 시도횟수</h3>
+                <div class="score-value" id="attempts">0</div>
+            </div>
+        </div>
+
+        <div class="game-info" id="gameInfo">게임 시작 버튼을 눌러 시작하세요!</div>
+
+        <div class="game-area">
+            <div class="reaction-zone" id="reactionZone">
+                <div class="reaction-content">
+                    <div class="reaction-title" id="reactionTitle">🎮 준비하세요!</div>
+                    <div class="reaction-message" id="reactionMessage">게임 시작 버튼을 눌러 시작하세요</div>
+                    <div class="reaction-time" id="reactionTime"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-info">
+            <div class="control-item">
+                <span class="key">CLICK</span>
+                <span>화면 클릭</span>
+            </div>
+            <div class="control-item">
+                <span class="key">SPACE</span>
+                <span>키보드 입력</span>
+            </div>
+            <div class="control-item">
+                <span class="key">H</span>
+                <span>도움말</span>
+            </div>
+            <div class="control-item">
+                <span class="key">R</span>
+                <span>게임 리셋</span>
+            </div>
+            <div class="control-item">
+                <span class="key">ESC</span>
+                <span>메인으로</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" onclick="startNewGame()" id="startBtn">🚀 게임 시작</button>
+            <button class="control-btn" onclick="pauseGame()" id="pauseBtn">⏸️ 일시정지</button>
+            <button class="control-btn" onclick="resetGame()">🔄 게임 리셋</button>
+            <button class="control-btn" onclick="showHelp()">📋 도움말</button>
+            <button class="control-btn" onclick="showStats()">📊 통계보기</button>
+            <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+        </div>
+
+        <div class="stats" id="statsSection">
+            <div class="stat-item">
+                <div>총 시도</div>
+                <div class="stat-value" id="totalAttempts">0</div>
+            </div>
+            <div class="stat-item">
+                <div>성공률</div>
+                <div class="stat-value" id="successRate">0%</div>
+            </div>
+            <div class="stat-item">
+                <div>최근 5회 평균</div>
+                <div class="stat-value" id="recent5Avg">-</div>
+            </div>
+        </div>
+
+        <div class="mobile-controls" id="mobileControls">
+            <div class="mobile-instruction">
+                화면을 터치하세요!
+            </div>
+        </div>
+    </div>
+
+    <!-- 결과 모달 -->
+    <div class="result-modal" id="resultModal">
+        <div class="modal-content">
+            <h2 id="resultTitle">⚡ 반응 완료!</h2>
+            <div class="result-time">
+                <span id="resultTimeValue">0ms</span>
+            </div>
+            <p id="resultMessage">번개같은 반응속도입니다!</p>
+            <div class="result-rating" id="resultRating">
+                <div class="rating-stars">⭐⭐⭐⭐⭐</div>
+                <div class="rating-text">완벽!</div>
+            </div>
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="nextRound()">다시 하기</button>
+                <button class="control-btn" onclick="goHome()">메인으로</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임오버 모달 -->
+    <div class="game-over-modal" id="gameOverModal">
+        <div class="modal-content game-over-content">
+            <h2>💥 게임 오버!</h2>
+            <div class="game-over-icon">
+                <div class="skull">💀</div>
+                <div class="explosion">💥</div>
+            </div>
+            <p id="gameOverMessage">너무 성급했어요!</p>
+            <div class="game-over-details">
+                <div class="detail-item">
+                    <span>반응 시도:</span>
+                    <span id="gameOverAttempt">1</span>
+                </div>
+                <div class="detail-item">
+                    <span>총 실패:</span>
+                    <span id="gameOverFails">1</span>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="control-btn retry-btn" onclick="retryGame()">🔄 다시 도전</button>
+                <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 도움말 모달 -->
+    <div class="help-modal" id="helpModal">
+        <div class="modal-content help-modal-content">
+            <h2>📋 반응속도 게임 도움말</h2>
+            
+            <div class="help-section">
+                <h3>🎮 게임 방법</h3>
+                <div class="help-text">
+                    <p>• 화면이 초록색으로 바뀌면 최대한 빠르게 클릭하세요</p>
+                    <p>• 너무 빨리 클릭하면 게임오버가 됩니다</p>
+                    <p>• 마우스 클릭 또는 키보드 입력이 가능합니다</p>
+                    <p>• 반응시간이 짧을수록 높은 점수를 받습니다</p>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h3>🎯 조작 방법</h3>
+                <div class="control-list">
+                    <div class="control-row">
+                        <span class="control-key">마우스 클릭</span>
+                        <span>반응 테스트 실행</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">스페이스바 / 엔터</span>
+                        <span>키보드로 반응</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">R키</span>
+                        <span>게임 리셋</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">H키</span>
+                        <span>도움말 열기</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">S키</span>
+                        <span>통계 보기</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-key">ESC키</span>
+                        <span>메인으로 돌아가기</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h3>📊 점수 시스템</h3>
+                <div class="rating-guide">
+                    <div class="rating-item perfect">
+                        <span class="rating-range">150ms 미만</span>
+                        <span class="rating-desc">🌟🌟🌟🌟🌟🌟 완벽!</span>
+                    </div>
+                    <div class="rating-item excellent">
+                        <span class="rating-range">150-199ms</span>
+                        <span class="rating-desc">⭐⭐⭐⭐⭐ 훌륭함</span>
+                    </div>
+                    <div class="rating-item good">
+                        <span class="rating-range">200-249ms</span>
+                        <span class="rating-desc">⭐⭐⭐⭐ 우수함</span>
+                    </div>
+                    <div class="rating-item average">
+                        <span class="rating-range">250-299ms</span>
+                        <span class="rating-desc">⭐⭐⭐ 보통</span>
+                    </div>
+                    <div class="rating-item slow">
+                        <span class="rating-range">300-399ms</span>
+                        <span class="rating-desc">⭐⭐ 느림</span>
+                    </div>
+                    <div class="rating-item very-slow">
+                        <span class="rating-range">400ms 이상</span>
+                        <span class="rating-desc">⭐ 매우 느림</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h3>💡 팁</h3>
+                <div class="help-text">
+                    <p>• 화면에 집중하고 긴장을 풀고 기다리세요</p>
+                    <p>• 예측하지 말고 색 변화에만 반응하세요</p>
+                    <p>• 규칙적인 연습으로 반응속도를 향상시킬 수 있습니다</p>
+                    <p>• 밝은 환경에서 플레이하는 것이 좋습니다</p>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeHelp()">✅ 확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상세 통계 모달 -->
+    <div class="detailed-stats-modal" id="detailedStatsModal">
+        <div class="modal-content stats-modal-content">
+            <h2>📊 상세 통계</h2>
+            
+            <div class="help-section">
+                <h3>전체 기록</h3>
+                <div class="stats-grid">
+                    <div class="stat-row">
+                        <span class="stat-label">총 시도 횟수:</span>
+                        <span class="stat-value" id="detailTotalAttempts">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">성공한 시도:</span>
+                        <span class="stat-value" id="detailSuccessAttempts">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">너무 빠른 클릭:</span>
+                        <span class="stat-value" id="detailFalseStarts">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">성공률:</span>
+                        <span class="stat-value" id="detailSuccessRate">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h3>반응시간 분석</h3>
+                <div class="stats-grid">
+                    <div class="stat-row">
+                        <span class="stat-label">최고 기록:</span>
+                        <span class="stat-value highlight" id="detailBestTime">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">전체 평균:</span>
+                        <span class="stat-value" id="detailAvgTime">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">최근 5회 평균:</span>
+                        <span class="stat-value" id="detailRecent5Avg">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">최근 10회 평균:</span>
+                        <span class="stat-value" id="detailRecent10Avg">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h3>등급별 통계</h3>
+                <div class="grade-stats" id="gradeStats">
+                    <div class="grade-item">
+                        <span class="grade-name">🌟🌟🌟🌟🌟🌟 완벽</span>
+                        <span class="grade-count" id="perfectCount">0회</span>
+                    </div>
+                    <div class="grade-item">
+                        <span class="grade-name">⭐⭐⭐⭐⭐ 훌륭</span>
+                        <span class="grade-count" id="excellentCount">0회</span>
+                    </div>
+                    <div class="grade-item">
+                        <span class="grade-name">⭐⭐⭐⭐ 우수</span>
+                        <span class="grade-count" id="goodCount">0회</span>
+                    </div>
+                    <div class="grade-item">
+                        <span class="grade-name">⭐⭐⭐ 보통</span>
+                        <span class="grade-count" id="averageCount">0회</span>
+                    </div>
+                    <div class="grade-item">
+                        <span class="grade-name">⭐⭐ 느림</span>
+                        <span class="grade-count" id="slowCount">0회</span>
+                    </div>
+                    <div class="grade-item">
+                        <span class="grade-name">⭐ 매우느림</span>
+                        <span class="grade-count" id="verySlowCount">0회</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="control-btn reset-btn" onclick="clearAllStats()">🗑️ 모든 기록 삭제</button>
+                <button class="control-btn" onclick="closeDetailedStats()">✅ 확인</button>
+            </div>
+            
+            <div class="warning-text">⚠️ 삭제된 기록은 복구할 수 없습니다</div>
+        </div>
+    </div>
+
+    <script src="js/game5.js"></script>
+</body>
+</html>
