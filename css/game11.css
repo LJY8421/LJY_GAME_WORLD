@@ -363,6 +363,9 @@ body::before {
     color: rgba(255, 255, 255, 0.5);
 }
 
+.mobile-hint-btn {
+    display: none; /* 기본적으로 숨김 */
+}
 /* =================== 스도쿠 보드 =================== */
 .sudoku-board {
     background: rgba(0, 20, 40, 0.8);
@@ -398,40 +401,52 @@ body::before {
     border: 1px solid transparent;
 }
 
-/* 3x3 박스별 배경색 구분 */
+/* 3x3 박스별 배경색 구분 - 개선된 디자인 */
 .sudoku-cell.box-light {
     background: linear-gradient(135deg, 
-        rgba(0, 255, 200, 0.2), 
-        rgba(50, 200, 255, 0.25), 
-        rgba(100, 150, 255, 0.2));
-    border-color: rgba(0, 255, 200, 0.5);
+        rgba(20, 30, 50, 0.9), 
+        rgba(30, 40, 60, 0.95));
+    border-color: rgba(80, 100, 150, 0.4);
     box-shadow: 
-        inset 0 0 15px rgba(0, 255, 200, 0.3),
-        0 0 5px rgba(0, 255, 200, 0.2);
+        inset 0 0 20px rgba(50, 70, 110, 0.25),
+        0 0 8px rgba(80, 120, 200, 0.15);
 }
 
 .sudoku-cell.box-dark {
     background: linear-gradient(135deg, 
-        rgba(255, 100, 200, 0.2), 
-        rgba(200, 50, 255, 0.25), 
-        rgba(150, 100, 255, 0.2));
-    border-color: rgba(255, 100, 200, 0.5);
+        rgba(45, 60, 85, 0.85), 
+        rgba(55, 70, 95, 0.9));
+    border-color: rgba(120, 140, 180, 0.4);
     box-shadow: 
-        inset 0 0 15px rgba(255, 100, 200, 0.3),
-        0 0 5px rgba(255, 100, 200, 0.2);
+        inset 0 0 20px rgba(80, 100, 140, 0.2),
+        0 0 8px rgba(120, 160, 220, 0.15);
 }
 
 /* 3x3 박스 경계선 */
 .sudoku-cell.border-right-thick {
-    border-right: 4px solid rgba(255, 215, 0, 1);
-    box-shadow: 3px 0 12px rgba(255, 215, 0, 0.7);
+    border-right: 3px solid rgba(180, 150, 100, 0.8);
+    box-shadow: 2px 0 10px rgba(200, 170, 120, 0.4);
 }
 
 .sudoku-cell.border-bottom-thick {
-    border-bottom: 4px solid rgba(255, 215, 0, 1);
-    box-shadow: 0 3px 12px rgba(255, 215, 0, 0.7);
+    border-bottom: 3px solid rgba(180, 150, 100, 0.8);
+    box-shadow: 0 2px 10px rgba(200, 170, 120, 0.4);
 }
 
+.sudoku-cell.given {
+    background: linear-gradient(135deg, 
+        rgba(40, 160, 140, 0.3), 
+        rgba(50, 180, 160, 0.35), 
+        rgba(45, 170, 150, 0.3)) !important;
+    color: #30e0c0;
+    font-weight: 900;
+    cursor: default;
+    text-shadow: 0 0 12px rgba(48, 224, 192, 0.9);
+    border-color: rgba(50, 180, 160, 0.5) !important;
+    box-shadow: 
+        inset 0 0 15px rgba(50, 180, 160, 0.3),
+        0 0 8px rgba(50, 200, 170, 0.4) !important;
+}
 .sudoku-cell.selected {
     background: linear-gradient(135deg, 
         rgba(255, 215, 0, 0.4), 
@@ -447,17 +462,17 @@ body::before {
 
 .sudoku-cell.given {
     background: linear-gradient(135deg, 
-        rgba(50, 255, 150, 0.3), 
-        rgba(0, 255, 128, 0.4), 
-        rgba(100, 255, 180, 0.3)) !important;
-    color: #00ff80;
+        rgba(40, 160, 140, 0.3), 
+        rgba(50, 180, 160, 0.35), 
+        rgba(45, 170, 150, 0.3)) !important;
+    color: #30e0c0;
     font-weight: 900;
     cursor: default;
-    text-shadow: 0 0 12px rgba(0, 255, 128, 1);
-    border-color: rgba(0, 255, 128, 0.8) !important;
+    text-shadow: 0 0 12px rgba(48, 224, 192, 0.9);
+    border-color: rgba(50, 180, 160, 0.5) !important;
     box-shadow: 
-        inset 0 0 20px rgba(0, 255, 128, 0.4),
-        0 0 8px rgba(0, 255, 128, 0.6) !important;
+        inset 0 0 15px rgba(50, 180, 160, 0.3),
+        0 0 8px rgba(50, 200, 170, 0.4) !important;
 }
 
 .sudoku-cell.error {
@@ -1213,15 +1228,16 @@ body::before {
     }
     
     .game-area-container {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
         gap: 25px;
         min-height: auto;
     }
     
     .number-pad-section {
-        width: 100%;
-        margin-top: 0;
+        width: auto;
+        margin-top: 50px;
         gap: 15px;
         order: 2;
     }
@@ -1230,6 +1246,14 @@ body::before {
         order: 1;
     }
     
+    .mobile-input {
+        max-width: 180px;
+    }
+    #mobileInput {
+        width: 180px;
+        padding: 10px 12px;
+        font-size: 1.2rem;
+    }
     .sudoku-board {
         width: 400px;
         height: 400px;
@@ -1373,9 +1397,18 @@ body::before {
     }
     
     .game-area-container {
+        flex-direction: column;  
+        align-items: center;     
         gap: 20px;
     }
+    .number-pad-section {
+        margin-top: 0;  
+        order: 2;       
+    }
     
+    .game-area {
+        order: 1;      
+    }
     .sudoku-board {
         width: 350px;
         height: 350px;
@@ -1444,28 +1477,27 @@ body::before {
     }
     
     .score-board {
-        flex-direction: column;
-        align-items: center;
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
+        margin-bottom: 15px;
     }
     
     .score-item {
-        width: 100%;
-        max-width: 280px;
-        padding: 8px 15px;
+        padding: 8px 10px;
+        min-width: auto;
     }
     
     .score-item h3 {
-        font-size: 0.85rem;
-        margin-bottom: 6px;
+        font-size: 0.75rem;
+        margin-bottom: 5px;
     }
     
     .score-value {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
     }
     
     .controls-info {
-        flex-direction: column;
+        flex-direction: row;
         gap: 8px;
     }
     
@@ -1481,16 +1513,13 @@ body::before {
     }
     
     .controls {
-        flex-direction: column;
-        align-items: center;
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
     }
     
     .control-btn {
-        width: 100%;
-        max-width: 280px;
-        padding: 12px 20px;
-        font-size: 0.9rem;
+        padding: 10px 12px;
+        font-size: 0.8rem;
     }
     
     .modal-content {
@@ -1667,14 +1696,32 @@ body::before {
         font-size: 1rem;
     }
     
+    .score-board {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+    
     .score-item {
-        max-width: 250px;
+        padding: 6px 8px;
+    }
+    
+    .score-item h3 {
+        font-size: 0.7rem;
+        margin-bottom: 4px;
+    }
+    
+    .score-value {
+        font-size: 1.2rem;
+    }
+    
+    .controls {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
     }
     
     .control-btn {
-        max-width: 250px;
-        padding: 10px 15px;
-        font-size: 0.85rem;
+        padding: 9px 10px;
+        font-size: 0.75rem;
     }
     
     .modal-content {
@@ -1783,34 +1830,38 @@ body::before {
         height: 45px;
     }
     
+    .score-board {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px;
+    }
+    
     .score-item {
-        max-width: 220px;
-        padding: 6px 12px;
+        padding: 5px 6px;
     }
     
     .score-item h3 {
-        font-size: 0.8rem;
-        margin-bottom: 4px;
+        font-size: 0.65rem;
+        margin-bottom: 3px;
     }
     
     .score-value {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
     
-    .control-item {
-        font-size: 0.8rem;
+    .controls {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px;
+    }
+    
+    .control-btn {
+        padding: 8px 8px;
+        font-size: 0.7rem;
     }
     
     .key {
         min-width: 45px;
         padding: 2px 5px;
         font-size: 0.75rem;
-    }
-    
-    .control-btn {
-        max-width: 220px;
-        padding: 8px 12px;
-        font-size: 0.8rem;
     }
     
     .modal-content {

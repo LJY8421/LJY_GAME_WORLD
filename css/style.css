@@ -428,10 +428,129 @@ body::before {
     opacity: 0.9;
 }
 
-@media (max-width: 480px) {
+/* 반응형 미디어 쿼리 */
+
+/* 1920px 이하 */
+@media (max-width: 1920px) {
+    .header h1 {
+        font-size: 3.5rem;
+    }
+    
     .game-carousel-container {
-        width: 320px;
-        height: 250px;
+        width: 400px;
+        height: 300px;
+    }
+    
+    .game-item {
+        width: 280px;
+        height: 180px;
+    }
+}
+
+/* 1366px 이하 */
+@media (max-width: 1366px) {
+    .header h1 {
+        font-size: 3.2rem;
+    }
+    
+    .header p {
+        font-size: 1.1rem;
+    }
+    
+    .game-carousel-container {
+        width: 380px;
+        height: 280px;
+    }
+    
+    .game-item {
+        width: 260px;
+        height: 170px;
+    }
+    
+    .game-icon {
+        font-size: 2.8rem;
+    }
+    
+    .game-title {
+        font-size: 1.3rem;
+    }
+}
+
+/* 1024px 이하 (태블릿) */
+@media (max-width: 1024px) {
+    .header h1 {
+        font-size: 3rem;
+    }
+    
+    .header p {
+        font-size: 1rem;
+    }
+    
+    .game-carousel-container {
+        width: 360px;
+        height: 260px;
+    }
+    
+    .game-item {
+        width: 250px;
+        height: 160px;
+    }
+    
+    .game-item.prev {
+        transform: translateX(-110px) scale(0.75);
+    }
+    
+    .game-item.next {
+        transform: translateX(110px) scale(0.75);
+    }
+    
+    .game-icon {
+        font-size: 2.5rem;
+        margin-bottom: 12px;
+    }
+    
+    .game-title {
+        font-size: 1.2rem;
+    }
+    
+    .game-description {
+        font-size: 0.85rem;
+    }
+    
+    .nav-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 1.1rem;
+    }
+}
+
+/* 768px 이하 (모바일 가로) */
+@media (max-width: 768px) {
+    .header {
+        margin-bottom: 30px;
+    }
+    
+    .header h1 {
+        font-size: 2.5rem;
+        letter-spacing: 2px;
+        white-space: nowrap;
+        text-shadow: 
+            0 0 3px #fff,
+            0 0 6px #fff,
+            0 0 10px #00ffff,
+            0 0 15px #00ffff,
+            0 0 20px #00ffff,
+            0 0 25px #00ffff;
+    }
+    
+    .header p {
+        font-size: 0.95rem;
+        text-shadow: 0 0 6px rgba(184, 184, 255, 0.5);
+    }
+    
+    .game-carousel-container {
+        width: 340px;
+        height: 240px;
     }
     
     .game-item {
@@ -439,16 +558,428 @@ body::before {
         height: 150px;
     }
     
-    .header h1 {
-        font-size: 2.5rem;
+    .game-item.prev {
+        transform: translateX(-100px) scale(0.7);
     }
+    
+    .game-item.next {
+        transform: translateX(100px) scale(0.7);
+    }
+    
+    .game-icon {
+        font-size: 2.3rem;
+        margin-bottom: 10px;
+    }
+    
+    .game-title {
+        font-size: 1.1rem;
+        margin-bottom: 6px;
+        text-shadow: 0 0 6px rgba(0, 255, 255, 0.7);
+    }
+    
+    .game-description {
+        font-size: 0.8rem;
+    }
+    
+    .navigation {
+        gap: 15px;
+        margin-top: 30px;
+    }
+    
+    .nav-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1rem;
+        padding: 12px 15px;
+    }
+    
+    .current-page {
+        font-size: 1rem;
+        min-width: 100px;
+        text-shadow: 0 0 6px rgba(0, 255, 255, 0.7);
+    }
+    
+    .start-btn,
+    .qr-btn {
+        padding: 12px 25px;
+        font-size: 1rem;
+        margin-top: 20px;
+    }
+    
     .qr-modal-content {
-        max-width: 90%;
-        padding: 30px 20px;
+        max-width: 85%;
+        padding: 35px 25px;
+    }
+    
+    .qr-modal-content h2 {
+        font-size: 1.6rem;
+        text-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
     }
     
     .qr-image {
         width: 180px;
         height: 180px;
+    }
+}
+
+/* 480px 이하 (모바일 세로) */
+@media (max-width: 480px) {
+    .header {
+        margin-bottom: 25px;
+    }
+    
+    .header h1 {
+        font-size: 1.8rem;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        font-weight: 900;
+        text-shadow: 
+            0 0 2px #fff,
+            0 0 4px #fff,
+            0 0 8px #00ffff,
+            0 0 12px #00ffff,
+            0 0 16px #00ffff;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .header p {
+        font-size: 0.85rem;
+        text-shadow: 0 0 5px rgba(184, 184, 255, 0.5);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .game-carousel-container {
+        width: 300px;
+        height: 220px;
+    }
+    
+    .game-item {
+        width: 220px;
+        height: 140px;
+    }
+    
+    .game-item.prev {
+        transform: translateX(-90px) scale(0.65);
+    }
+    
+    .game-item.next {
+        transform: translateX(90px) scale(0.65);
+    }
+    
+    .game-item.active {
+        transform: scale(1.05);
+    }
+    
+    .game-icon {
+        font-size: 2rem;
+        margin-bottom: 8px;
+    }
+    
+    .game-title {
+        font-size: 1rem;
+        margin-bottom: 5px;
+        font-weight: 700;
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.6);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .game-description {
+        font-size: 0.75rem;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .navigation {
+        gap: 12px;
+        margin-top: 25px;
+    }
+    
+    .nav-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 0.95rem;
+        padding: 10px 12px;
+        font-weight: 700;
+    }
+    
+    .current-page {
+        font-size: 0.9rem;
+        min-width: 90px;
+        font-weight: 700;
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.6);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .start-btn,
+    .qr-btn {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+        margin-top: 15px;
+        font-weight: 700;
+    }
+    
+    .qr-modal-content {
+        max-width: 90%;
+        padding: 30px 20px;
+    }
+    
+    .qr-modal-content h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    }
+    
+    .qr-close {
+        font-size: 30px;
+        right: 20px;
+        text-shadow: 0 0 8px rgba(255, 0, 255, 0.8);
+    }
+    
+    .qr-image-container {
+        padding: 15px;
+    }
+    
+    .qr-image {
+        width: 160px;
+        height: 160px;
+    }
+    
+    .qr-modal-content p {
+        font-size: 0.9rem;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* 360px 이하 (소형 모바일) */
+@media (max-width: 360px) {
+    .header h1 {
+        font-size: 1.5rem;
+        letter-spacing: 0px;
+        white-space: nowrap;
+        font-weight: 900;
+        text-shadow: 
+            0 0 2px #fff,
+            0 0 4px #fff,
+            0 0 7px #00ffff,
+            0 0 10px #00ffff,
+            0 0 14px #00ffff;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .header p {
+        font-size: 0.8rem;
+        text-shadow: 0 0 4px rgba(184, 184, 255, 0.5);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .game-carousel-container {
+        width: 280px;
+        height: 200px;
+    }
+    
+    .game-item {
+        width: 200px;
+        height: 130px;
+    }
+    
+    .game-item.prev {
+        transform: translateX(-80px) scale(0.6);
+    }
+    
+    .game-item.next {
+        transform: translateX(80px) scale(0.6);
+    }
+    
+    .game-icon {
+        font-size: 1.8rem;
+        margin-bottom: 6px;
+    }
+    
+    .game-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-shadow: 0 0 4px rgba(0, 255, 255, 0.6);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .game-description {
+        font-size: 0.7rem;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .nav-btn {
+        width: 42px;
+        height: 42px;
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+    
+    .current-page {
+        font-size: 0.85rem;
+        min-width: 80px;
+        font-weight: 700;
+        text-shadow: 0 0 4px rgba(0, 255, 255, 0.6);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .start-btn,
+    .qr-btn {
+        padding: 8px 18px;
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+    
+    .qr-modal-content {
+        padding: 25px 15px;
+    }
+    
+    .qr-modal-content h2 {
+        font-size: 1.3rem;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
+    }
+    
+    .qr-image {
+        width: 140px;
+        height: 140px;
+    }
+}
+
+/* 320px 이하 (초소형 모바일) */
+@media (max-width: 320px) {
+    .header h1 {
+        font-size: 1.3rem;
+        letter-spacing: 0px;
+        white-space: nowrap;
+        font-weight: 900;
+        text-shadow: 
+            0 0 2px #fff,
+            0 0 4px #fff,
+            0 0 6px #00ffff,
+            0 0 9px #00ffff,
+            0 0 12px #00ffff;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .header p {
+        font-size: 0.75rem;
+        text-shadow: 0 0 3px rgba(184, 184, 255, 0.5);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .game-carousel-container {
+        width: 260px;
+        height: 180px;
+    }
+    
+    .game-item {
+        width: 180px;
+        height: 120px;
+    }
+    
+    .game-item.prev {
+        transform: translateX(-70px) scale(0.55);
+    }
+    
+    .game-item.next {
+        transform: translateX(70px) scale(0.55);
+    }
+    
+    .game-item.active {
+        transform: scale(1);
+    }
+    
+    .game-icon {
+        font-size: 1.6rem;
+        margin-bottom: 5px;
+    }
+    
+    .game-title {
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+        font-weight: 700;
+        text-shadow: 0 0 3px rgba(0, 255, 255, 0.6);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .game-description {
+        font-size: 0.65rem;
+        line-height: 1.2;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .navigation {
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .nav-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 0.85rem;
+        padding: 8px 10px;
+        font-weight: 700;
+    }
+    
+    .current-page {
+        font-size: 0.8rem;
+        min-width: 70px;
+        font-weight: 700;
+        text-shadow: 0 0 3px rgba(0, 255, 255, 0.6);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .start-btn,
+    .qr-btn {
+        padding: 8px 15px;
+        font-size: 0.85rem;
+        margin-top: 12px;
+        font-weight: 700;
+    }
+    
+    .qr-modal-content {
+        padding: 20px 12px;
+    }
+    
+    .qr-modal-content h2 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
+    }
+    
+    .qr-close {
+        font-size: 28px;
+        right: 15px;
+        top: 10px;
+        text-shadow: 0 0 6px rgba(255, 0, 255, 0.8);
+    }
+    
+    .qr-image-container {
+        padding: 12px;
+    }
+    
+    .qr-image {
+        width: 130px;
+        height: 130px;
+    }
+    
+    .qr-modal-content p {
+        font-size: 0.8rem;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 }
