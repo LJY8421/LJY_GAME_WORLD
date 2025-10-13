@@ -303,6 +303,130 @@ body::before {
 .start-btn:active {
     transform: translateY(0);
 }
+/* QR 버튼 스타일 */
+.qr-btn {
+    font-family: 'Orbitron', monospace;
+    background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+    border: 2px solid rgba(0, 255, 255, 0.6);
+    color: #ffffff;
+    padding: 15px 30px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.4),
+        inset 0 0 20px rgba(0, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.qr-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(45deg, rgba(0, 255, 255, 0.3), rgba(255, 0, 255, 0.3));
+    border-color: rgba(255, 0, 255, 0.8);
+    box-shadow: 
+        0 0 30px rgba(255, 0, 255, 0.6),
+        inset 0 0 30px rgba(255, 0, 255, 0.1);
+}
+
+.qr-btn:active {
+    transform: translateY(0);
+}
+
+/* QR 모달 스타일 */
+.qr-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-modal.show {
+    display: flex;
+}
+
+.qr-modal.fade-in {
+    opacity: 1;
+}
+
+.qr-modal-content {
+    background: linear-gradient(135deg, rgba(0, 20, 40, 0.95), rgba(20, 0, 40, 0.95));
+    border: 3px solid rgba(0, 255, 255, 0.5);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 
+        0 0 50px rgba(0, 255, 255, 0.4),
+        inset 0 0 30px rgba(0, 255, 255, 0.1);
+    transform: scale(0.7);
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+}
+
+.qr-modal.fade-in .qr-modal-content {
+    transform: scale(1);
+}
+
+.qr-modal-content h2 {
+    font-family: 'Orbitron', monospace;
+    color: #00ffff;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+}
+
+.qr-close {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    color: #ff00ff;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
+}
+
+.qr-close:hover {
+    color: #00ffff;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+    transform: rotate(90deg);
+}
+
+.qr-image-container {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    display: inline-block;
+    margin: 20px 0;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+}
+
+.qr-image {
+    width: 200px;
+    height: 200px;
+    display: block;
+}
+
+.qr-modal-content p {
+    font-family: 'Orbitron', monospace;
+    color: #b8b8ff;
+    font-size: 1rem;
+    margin-top: 15px;
+    opacity: 0.9;
+}
 
 @media (max-width: 480px) {
     .game-carousel-container {
@@ -317,5 +441,14 @@ body::before {
     
     .header h1 {
         font-size: 2.5rem;
+    }
+    .qr-modal-content {
+        max-width: 90%;
+        padding: 30px 20px;
+    }
+    
+    .qr-image {
+        width: 180px;
+        height: 180px;
     }
 }

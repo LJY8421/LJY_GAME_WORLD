@@ -257,25 +257,36 @@ function createBoard() {
     gameBoard = [];
     elements.gameBoard.innerHTML = '';
     
-    // 난이도별 셀 크기 설정 (모든 난이도에서 간격을 동일하게)
+    // 난이도별 셀 크기 설정
     let cellSize = '30px';
     let fontSize = '1rem';
     let gap = '2px';
     let padding = '15px';
     
-    if (currentDifficulty === 'hard') {
-        cellSize = '22px';  // 크기를 좀 더 크게
-        fontSize = '0.8rem';  // 폰트도 조금 더 크게
-        gap = '2px';  // 중급과 동일한 간격
-        padding = '15px';  // 중급과 동일한 패딩
+    // 768px 이하에서는 더 작은 크기 사용
+    if (window.innerWidth <= 768) {
+        if (currentDifficulty === 'hard') {
+            cellSize = '18px';  // 더 작게
+            fontSize = '0.7rem';
+            gap = '1px';
+            padding = '8px';
+        } else if (currentDifficulty === 'medium') {
+            cellSize = '20px';
+            fontSize = '0.75rem';
+            gap = '1px';
+            padding = '8px';
+        } else if (currentDifficulty === 'easy') {
+            cellSize = '24px';
+            fontSize = '0.8rem';
+            gap = '1px';
+            padding = '8px';
+        }
+    } else if (currentDifficulty === 'hard') {
+        cellSize = '22px';
+        fontSize = '0.8rem';
     } else if (currentDifficulty === 'medium') {
         cellSize = '25px';
         fontSize = '0.9rem';
-    } else if (currentDifficulty === 'easy') {
-        cellSize = '30px';
-        fontSize = '1rem';
-        gap = '2px';  // 중급과 동일한 간격
-        padding = '15px';  // 중급과 동일한 패딩
     }
     
     // CSS 설정

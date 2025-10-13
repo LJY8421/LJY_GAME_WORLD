@@ -1018,7 +1018,7 @@ body::before {
     
     .controls-info {
         gap: 15px;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
     }
     

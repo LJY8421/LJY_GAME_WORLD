@@ -163,6 +163,43 @@ function startGame() {
     }
 }
 
+// QR 코드 모달 기능
+const qrBtn = document.getElementById('qrBtn');
+const qrModal = document.getElementById('qrModal');
+const qrClose = document.getElementById('qrClose');
+
+// QR 버튼 클릭
+qrBtn.addEventListener('click', () => {
+    qrModal.style.display = 'flex';
+    setTimeout(() => {
+        qrModal.classList.add('fade-in');
+    }, 10);
+});
+
+// 닫기 버튼 클릭
+qrClose.addEventListener('click', closeQRModal);
+
+// 모달 배경 클릭
+qrModal.addEventListener('click', (e) => {
+    if (e.target === qrModal) {
+        closeQRModal();
+    }
+});
+
+// ESC 키로 닫기
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && qrModal.classList.contains('fade-in')) {
+        closeQRModal();
+    }
+});
+
+function closeQRModal() {
+    qrModal.classList.remove('fade-in');
+    setTimeout(() => {
+        qrModal.style.display = 'none';
+    }, 400);
+}
+
 // 이벤트 리스너
 nextBtn.addEventListener('click', nextGame);
 prevBtn.addEventListener('click', prevGame);

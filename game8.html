@@ -74,7 +74,24 @@
             </div>
         </div>
     </div>
-
+    <!-- 모바일 컨트롤 -->
+    <div class="mobile-controls">
+        <div class="mobile-control-row">
+            <button class="mobile-btn" data-direction="up">↑</button>
+        </div>
+        <div class="mobile-control-row">
+            <button class="mobile-btn" data-direction="left">←</button>
+            <button class="mobile-btn" data-direction="down">↓</button>
+            <button class="mobile-btn" data-direction="right">→</button>
+        </div>
+        <!-- 육각형 모드 전용 버튼들 -->
+        <div class="hex-controls" id="hexControls" style="display: none;">
+            <div class="hex-control-row">
+                <button class="mobile-btn hex-btn" data-direction="upleft">↖</button>
+                <button class="mobile-btn hex-btn" data-direction="upright">↗</button>
+            </div>
+        </div>
+    </div>
     <div class="controls-info">
         <div class="control-item">
             <span class="key">↑↓←→</span>
@@ -97,7 +114,7 @@
             <span>도움말</span>
         </div>
     </div>
-
+    
     <div class="controls">
         <button class="control-btn" onclick="startNewGame()">🚀 게임 시작</button>
         <button class="control-btn" onclick="pauseGame()" id="pauseBtn">⏸️ 일시정지</button>
@@ -106,25 +123,6 @@
         <button class="control-btn" onclick="showHelp()">📋 도움말</button>
         <button class="control-btn" onclick="showStats()">📊 통계 보기</button>
         <button class="control-btn" onclick="goHome()">🏠 메인으로</button>
-    </div>
-
-    <!-- 모바일 컨트롤 -->
-    <div class="mobile-controls">
-        <div class="mobile-control-row">
-            <button class="mobile-btn" data-direction="up">↑</button>
-        </div>
-        <div class="mobile-control-row">
-            <button class="mobile-btn" data-direction="left">←</button>
-            <button class="mobile-btn" data-direction="down">↓</button>
-            <button class="mobile-btn" data-direction="right">→</button>
-        </div>
-        <!-- 육각형 모드 전용 버튼들 -->
-        <div class="hex-controls" id="hexControls" style="display: none;">
-            <div class="hex-control-row">
-                <button class="mobile-btn hex-btn" data-direction="upleft">↖</button>
-                <button class="mobile-btn hex-btn" data-direction="upright">↗</button>
-            </div>
-        </div>
     </div>
 
     <div class="stats">

@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="LJY_GAME" />
     <meta property="og:description" content="수업 중 몰래 시간 보내기 ㅎㅎ" />
-    <meta property="og:image" content="images/LJY_image" />
+    <meta property="og:image" content="https://ljy8421.github.io/LJY_GAME_WORLD/images/ljy-game-og-image.png"/>
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:url" content="https://yourdomain.com" />
+    <meta property="og:url" content="https://ljy8421.github.io/LJY_GAME_WORLD/" />
     <meta property="og:type" content="website" />
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
@@ -100,6 +100,26 @@
 </div>
 
 <button class="start-btn" id="startBtn">🎮 게임 시작! 🎮</button>
+<button class="qr-btn" id="qrBtn">📱 QR코드 📱</button>
+<!-- QR코드 모달 추가 -->
+<div class="qr-modal" id="qrModal">
+    <div class="qr-modal-content">
+        <span class="qr-close" id="qrClose">&times;</span>
+        <h2>QR코드</h2>
+        <div class="qr-image-container">
+            <img src="images/qr-code.png" alt="QR Code" class="qr-image">
+        </div>
+        <p> 이 미니게임은 제작자 본인이 수업 중 몰래 시간 떼우려고 만든 것입니다 </p>
+        <p style="font-size: 0.85rem; margin-top: 5px;">⚠️
+        <span style="color: #ff0033; font-weight: 900; text-shadow: 0 0 10px #ff0033, 0 0 20px #ff0033;"> 무단 복제</span> 
+        및 
+        <span style="color: #ff0033; font-weight: 900; text-shadow: 0 0 10px #ff0033, 0 0 20px #ff0033;">재배포</span>를 
+        금지합니다 ⚠️
+        </p><br>
+        <p style="font-size: 0.75rem; margin-top: 5px; opacity: 0.8;">제작자 : LJY</p>
+        <p style="font-size: 0.75rem; margin-top: 5px; opacity: 0.8;">© 2025 LJY Game World</p>
+    </div>
+</div>
 
 </body>
 <script src="js/index.js"></script>
