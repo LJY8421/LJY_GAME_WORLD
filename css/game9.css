@@ -953,21 +953,20 @@ body::before {
     
     .score-board {
         gap: 8px;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        flex-wrap: wrap;
     }
     
     .score-item {
         min-width: 70px;
         padding: 8px 10px;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
-        gap: 5px;
-        width: auto;
-        flex: 0 1 auto;
+        gap: 10px;
+        width: 100%;
+        max-width: 280px;
+        justify-content: space-between;
     }
     
     .score-item h3 {
@@ -985,13 +984,10 @@ body::before {
     }
     
     .control-btn {
-        padding: 10px 12px;
-        font-size: 0.7rem;
-        flex: 0 1 auto;
-        min-width: 80px;
-        white-space: normal;
-        line-height: 1.3;
-        height: auto;
+        padding: 8px 10px;
+        font-size: 0.75rem;
+        flex: 1;
+        min-width: 70px;
     }
     
     .game-info {
@@ -1058,17 +1054,9 @@ body::before {
         font-size: 1.8rem;
     }
     
-    .score-board {
-        gap: 6px;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
     .score-item {
-        min-width: 65px;
+        max-width: 250px;
         padding: 6px 8px;
-        flex: 0 1 auto;
     }
     
     .score-value {
@@ -1076,12 +1064,9 @@ body::before {
     }
     
     .control-btn {
-        padding: 8px 10px;
-        font-size: 0.65rem;
-        min-width: 70px;
-        white-space: normal;
-        line-height: 1.3;
-        height: auto;
+        padding: 6px 8px;
+        font-size: 0.7rem;
+        min-width: 60px;
     }
     
     .modal-content {
@@ -1128,17 +1113,9 @@ body::before {
         font-size: 1.5rem;
     }
     
-    .score-board {
-        gap: 5px;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
     .score-item {
-        min-width: 55px;
+        max-width: 220px;
         padding: 5px 6px;
-        flex: 0 1 auto;
     }
     
     .score-item h3 {
@@ -1150,12 +1127,9 @@ body::before {
     }
     
     .control-btn {
-        padding: 8px 8px;
-        font-size: 0.6rem;
-        min-width: 65px;
-        white-space: normal;
-        line-height: 1.3;
-        height: auto;
+        padding: 5px 6px;
+        font-size: 0.65rem;
+        min-width: 50px;
     }
     
     .game-info {

@@ -1363,7 +1363,7 @@ body::before {
     
     .controls-info {
         gap: 10px;
-        flex-direction: row;
+        flex-direction: column;
         margin-bottom: 10px;
     }
     
