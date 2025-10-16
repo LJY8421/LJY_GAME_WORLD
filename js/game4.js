@@ -835,12 +835,23 @@ function setupEventListeners() {
     // 키보드 이벤트
     document.addEventListener('keydown', handleKeyDown);
     
-    // 모바일 컨트롤 버튼
+    // 모바일 컨트롤 버튼 - 이벤트 중복 제거
     const mobileButtons = document.querySelectorAll('.mobile-btn');
     mobileButtons.forEach(button => {
-        button.addEventListener('click', handleMobileControl);
-        button.addEventListener('touchstart', handleMobileControl, { passive: true });
+        // touchstart만 사용 (click 이벤트 제거)
+        button.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // 기본 동작 방지
+            handleMobileControl(e);
+        }, { passive: false });
+        
+        // 데스크톱용 click 이벤트는 조건부로 추가
+        if (!('ontouchstart' in window)) {
+            button.addEventListener('click', handleMobileControl);
+        }
     });
+    
+    // 스와이프 제어 추가
+    setupSwipeControls();
     
     // 포커스 관리 (게임이 백그라운드로 갈 때 일시정지)
     window.addEventListener('blur', () => {
@@ -994,7 +1005,9 @@ function handleKeyDown(e) {
 
 function handleMobileControl(e) {
     e.preventDefault();
-    const action = e.target.getAttribute('data-action');
+    e.stopPropagation(); // 이벤트 전파 중단
+    
+    const action = e.currentTarget.getAttribute('data-action'); 
     
     // 게임 시작
     if (gameState === 'ready' && 
@@ -1028,10 +1041,86 @@ function handleMobileControl(e) {
             break;
     }
 }
-
+// 스와이프 제어 설정
+function setupSwipeControls() {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+    let touchStartTime = 0;
+    let hasMoved = false; // 움직임 감지 플래그 추가
+    
+    const minSwipeDistance = 30; // 최소 스와이프 거리
+    const maxSwipeTime = 300; // 최대 스와이프 시간 (밀리초)
+    const tapMaxDistance = 10; // 탭으로 인식할 최대 거리
+    
+    canvas.addEventListener('touchstart', (e) => {
+        if (gameState !== 'playing') return;
+        
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchEndX = touch.clientX; // 시작 시 end 값도 초기화
+        touchEndY = touch.clientY; // 시작 시 end 값도 초기화
+        touchStartTime = Date.now();
+        hasMoved = false; // 움직임 플래그 초기화
+    }, { passive: true });
+    
+    canvas.addEventListener('touchmove', (e) => {
+        if (gameState !== 'playing') return;
+        e.preventDefault(); // 스크롤 방지
+        
+        const touch = e.touches[0];
+        touchEndX = touch.clientX;
+        touchEndY = touch.clientY;
+        hasMoved = true; // 움직임 감지
+    }, { passive: false });
+    
+    canvas.addEventListener('touchend', (e) => {
+        if (gameState !== 'playing') return;
+        
+        const touchTime = Date.now() - touchStartTime;
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+        const absDeltaX = Math.abs(deltaX);
+        const absDeltaY = Math.abs(deltaY);
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        // 탭 감지 (거의 움직이지 않음 + 짧은 시간) - 회전
+        if (!hasMoved || (distance < tapMaxDistance && touchTime < 200)) {
+            rotatePiece();
+            return;
+        }
+        
+        // 스와이프 감지
+        if (distance >= minSwipeDistance && touchTime < maxSwipeTime) {
+            // 가로 스와이프가 세로보다 크면
+            if (absDeltaX > absDeltaY) {
+                if (deltaX > 0) {
+                    // 오른쪽 스와이프
+                    movePiece(1, 0);
+                } else {
+                    // 왼쪽 스와이프
+                    movePiece(-1, 0);
+                }
+            } 
+            // 세로 스와이프가 가로보다 크면
+            else {
+                if (deltaY > 0) {
+                    // 아래 스와이프 - 빠른 낙하
+                    movePiece(0, 1);
+                } else {
+                    // 위 스와이프 - 즉시 낙하
+                    dropPiece();
+                }
+            }
+        }
+    }, { passive: true });
+}
 // 터치 이벤트 방지 (모바일에서 스크롤 방지)
 document.addEventListener('touchmove', function(e) {
-    if (gameState === 'playing') {
+    // canvas가 아닌 곳에서만 스크롤 방지
+    if (gameState === 'playing' && e.target !== canvas) {
         e.preventDefault();
     }
 }, { passive: false });
