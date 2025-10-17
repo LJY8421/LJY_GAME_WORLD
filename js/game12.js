@@ -21,17 +21,35 @@ let playerUpgrades = {
 const GAME_CONFIG = {
     playerWidth: 40,
     playerHeight: 30,
-    playerSpeed: 8,
+    playerSpeed: 6,
     laserWidth: 4,
     laserHeight: 15,
-    laserSpeed: 9,
+    laserSpeed: 6,
     enemyWidth: 35,
     enemyHeight: 25,
     enemySpeed: 2,
     enemySpawnRate: 1500,
     laserCooldown: 200
 };
-
+// 게임 설정을 동적으로 계산하는 함수 추가 
+function getScaledConfig() {
+    const baseWidth = 800;
+    const scale = canvas.width / baseWidth;
+    
+    return {
+        playerWidth: 40 * scale,
+        playerHeight: 30 * scale,
+        playerSpeed: 6 * scale,
+        laserWidth: 4 * scale,
+        laserHeight: 15 * scale,
+        laserSpeed: 6 * scale,
+        enemyWidth: 35 * scale,
+        enemyHeight: 25 * scale,
+        enemySpeed: 2 * scale,
+        enemySpawnRate: 1500,
+        laserCooldown: 200
+    };
+}
 // 게임 상태
 let gameStats = {
     score: 0,
@@ -100,13 +118,15 @@ class Explosion {
     }
     
     createParticles() {
+        const scale = canvas.width / 800;
         const particleCount = 15 * this.size;
+        
         for (let i = 0; i < particleCount; i++) {
             this.particles.push({
                 x: this.x,
                 y: this.y,
-                vx: (Math.random() - 0.5) * 8 * this.size,
-                vy: (Math.random() - 0.5) * 8 * this.size,
+                vx: (Math.random() - 0.5) * 8 * this.size * scale,
+                vy: (Math.random() - 0.5) * 8 * this.size * scale,
                 life: 30,
                 maxLife: 30,
                 color: `hsl(${Math.random() * 60 + 15}, 100%, 50%)`
@@ -129,13 +149,15 @@ class Explosion {
     }
     
     draw() {
+        const scale = canvas.width / 800;
+        
         ctx.save();
         this.particles.forEach(particle => {
             const alpha = particle.life / particle.maxLife;
             ctx.globalAlpha = alpha;
             ctx.fillStyle = particle.color;
             ctx.beginPath();
-            ctx.arc(particle.x, particle.y, 3 * this.size, 0, Math.PI * 2);
+            ctx.arc(particle.x, particle.y, 3 * this.size * scale, 0, Math.PI * 2);
             ctx.fill();
         });
         ctx.restore();
@@ -156,6 +178,13 @@ function init() {
         return;
     }
     
+    // 모바일에서 스크롤 방지
+    document.body.addEventListener('touchmove', (e) => {
+        if (e.target.closest('.mobile-btn') || e.target === canvas) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
     resizeCanvas();
     initializeGame();
     setupEventListeners();
@@ -168,18 +197,87 @@ function resizeCanvas() {
     const maxWidth = Math.min(800, container.clientWidth - 40);
     const ratio = 500 / 800;
     
+    const oldWidth = canvas.width;
+    const oldHeight = canvas.height;
+    
     canvas.width = maxWidth;
     canvas.height = maxWidth * ratio;
     canvas.style.width = maxWidth + 'px';
     canvas.style.height = (maxWidth * ratio) + 'px';
+    
+    if (elements.gameOverlay) {
+        elements.gameOverlay.style.width = maxWidth + 'px';
+        elements.gameOverlay.style.height = (maxWidth * ratio) + 'px';
+    }
+    
+    const scaleX = canvas.width / oldWidth;
+    const scaleY = canvas.height / oldHeight;
+    
+    if (player && oldWidth > 0 && !isNaN(scaleX)) {
+        player.x = player.x * scaleX;
+        player.y = player.y * scaleY;
+        player.width = player.width * scaleX;
+        player.height = player.height * scaleY;
+        
+        allies.forEach(ally => {
+            ally.x = ally.x * scaleX;
+            ally.y = ally.y * scaleY;
+            ally.width = ally.width * scaleX;
+            ally.height = ally.height * scaleY;
+            if (ally.targetX !== undefined) {
+                ally.targetX = ally.targetX * scaleX;
+                ally.targetY = ally.targetY * scaleY;
+            }
+        });
+        
+        enemies.forEach(enemy => {
+            enemy.x = enemy.x * scaleX;
+            enemy.y = enemy.y * scaleY;
+            enemy.width = enemy.width * scaleX;
+            enemy.height = enemy.height * scaleY;
+        });
+        
+        lasers.forEach(laser => {
+            laser.x = laser.x * scaleX;
+            laser.y = laser.y * scaleY;
+            laser.width = laser.width * scaleX;
+            laser.height = laser.height * scaleY;
+        });
+        
+        items.forEach(item => {
+            item.x = item.x * scaleX;
+            item.y = item.y * scaleY;
+            item.width = item.width * scaleX;
+            item.height = item.height * scaleY;
+        });
+        
+        bossBullets.forEach(bullet => {
+            bullet.x = bullet.x * scaleX;
+            bullet.y = bullet.y * scaleY;
+            bullet.width = bullet.width * scaleX;
+            bullet.height = bullet.height * scaleY;
+        });
+        
+        explosions.forEach(explosion => {
+            explosion.x = explosion.x * scaleX;
+            explosion.y = explosion.y * scaleY;
+            explosion.size = explosion.size * scaleX;
+            explosion.particles.forEach(particle => {
+                particle.x = particle.x * scaleX;
+                particle.y = particle.y * scaleY;
+            });
+        });
+    }
 }
 
 function initializeGame() {
+    const config = getScaledConfig();
+    
     player = {
-        x: canvas.width / 2 - GAME_CONFIG.playerWidth / 2,
-        y: canvas.height - GAME_CONFIG.playerHeight - 15,
-        width: GAME_CONFIG.playerWidth,
-        height: GAME_CONFIG.playerHeight
+        x: canvas.width / 2 - config.playerWidth / 2,
+        y: canvas.height - config.playerHeight - 15 * (canvas.width / 800),
+        width: config.playerWidth,
+        height: config.playerHeight
     };
     
     lasers = [];
@@ -202,12 +300,104 @@ function initializeGame() {
     
     gameState = 'ready';
 }
-
 function setupEventListeners() {
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     setupModalClickEvents();
-    window.addEventListener('resize', resizeCanvas);
+    setupMobileControls(); // 추가
+    
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            resizeCanvas();
+        }, 100);
+    });
+}
+function setupMobileControls() {
+    const btnLeft = document.getElementById('btnLeft');
+    const btnRight = document.getElementById('btnRight');
+    const btnFire = document.getElementById('btnFire');
+    
+    if (!btnLeft || !btnRight || !btnFire) return;
+    
+    // 왼쪽 버튼
+    btnLeft.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys.left = true;
+    });
+    
+    btnLeft.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys.left = false;
+    });
+    
+    btnLeft.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        keys.left = false;
+    });
+    
+    // 오른쪽 버튼
+    btnRight.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys.right = true;
+    });
+    
+    btnRight.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys.right = false;
+    });
+    
+    btnRight.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        keys.right = false;
+    });
+    
+    // 발사 버튼
+    btnFire.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys.space = true;
+        
+        if (gameState === 'ready') {
+            startGame();
+        } else if (gameState === 'bossWarning') {
+            gameState = 'playing';
+            elements.gameOverlay.classList.add('hidden');
+            spawnBoss(currentBossType);
+        }
+    });
+    
+    btnFire.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys.space = false;
+    });
+    
+    btnFire.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        keys.space = false;
+    });
+    
+    // 마우스 이벤트도 추가 (데스크톱에서도 버튼 사용 가능)
+    btnLeft.addEventListener('mousedown', () => keys.left = true);
+    btnLeft.addEventListener('mouseup', () => keys.left = false);
+    btnLeft.addEventListener('mouseleave', () => keys.left = false);
+    
+    btnRight.addEventListener('mousedown', () => keys.right = true);
+    btnRight.addEventListener('mouseup', () => keys.right = false);
+    btnRight.addEventListener('mouseleave', () => keys.right = false);
+    
+    btnFire.addEventListener('mousedown', () => {
+        keys.space = true;
+        if (gameState === 'ready') {
+            startGame();
+        } else if (gameState === 'bossWarning') {
+            gameState = 'playing';
+            elements.gameOverlay.classList.add('hidden');
+            spawnBoss(currentBossType);
+        }
+    });
+    btnFire.addEventListener('mouseup', () => keys.space = false);
+    btnFire.addEventListener('mouseleave', () => keys.space = false);
 }
 
 function setupModalClickEvents() {
@@ -375,44 +565,47 @@ function update() {
 }
 
 function updatePlayer() {
+    const config = getScaledConfig();
+    
     if (keys.left && player.x > 0) {
-        player.x -= GAME_CONFIG.playerSpeed;
+        player.x -= config.playerSpeed;
     }
     if (keys.right && player.x < canvas.width - player.width) {
-        player.x += GAME_CONFIG.playerSpeed;
+        player.x += config.playerSpeed;
     }
 }
 
 function shootLaser() {
+    const config = getScaledConfig();
     const currentTime = Date.now();
-    if (currentTime - lastLaserTime > GAME_CONFIG.laserCooldown) {
+    
+    if (currentTime - lastLaserTime > config.laserCooldown) {
         if (playerUpgrades.tripleLaser && currentTime < playerUpgrades.tripleLaserEndTime) {
-            // 트리플 레이저 발사
-            lasers.push(createLaser(player.x + player.width / 2 - GAME_CONFIG.laserWidth / 2 - 12, 'triple'));
-            lasers.push(createLaser(player.x + player.width / 2 - GAME_CONFIG.laserWidth / 2, 'triple'));
-            lasers.push(createLaser(player.x + player.width / 2 - GAME_CONFIG.laserWidth / 2 + 12, 'triple'));
+            const spacing = 12 * (canvas.width / 800);
+            lasers.push(createLaser(player.x + player.width / 2 - config.laserWidth / 2 - spacing, 'triple'));
+            lasers.push(createLaser(player.x + player.width / 2 - config.laserWidth / 2, 'triple'));
+            lasers.push(createLaser(player.x + player.width / 2 - config.laserWidth / 2 + spacing, 'triple'));
         } else if (playerUpgrades.doubleLaser && currentTime < playerUpgrades.doubleLaserEndTime) {
-            // 더블 레이저 발사
-            lasers.push(createLaser(player.x + player.width / 2 - GAME_CONFIG.laserWidth / 2 - 8, 'double'));
-            lasers.push(createLaser(player.x + player.width / 2 - GAME_CONFIG.laserWidth / 2 + 8, 'double'));
+            const spacing = 8 * (canvas.width / 800);
+            lasers.push(createLaser(player.x + player.width / 2 - config.laserWidth / 2 - spacing, 'double'));
+            lasers.push(createLaser(player.x + player.width / 2 - config.laserWidth / 2 + spacing, 'double'));
         } else {
-            // 일반 레이저 발사
-            lasers.push(createLaser(player.x + player.width / 2 - GAME_CONFIG.laserWidth / 2, 'normal'));
+            lasers.push(createLaser(player.x + player.width / 2 - config.laserWidth / 2, 'normal'));
         }
         lastLaserTime = currentTime;
     }
 }
-
     // 크라스투스 레이저 효과 적용
 function createLaser(x, type) {
+    const config = getScaledConfig();
     const isKrasthus = playerUpgrades.krasthusLaser && Date.now() < playerUpgrades.krasthusLaserEndTime;
     
     return {
         x: x,
         y: player.y,
-        width: isKrasthus ? GAME_CONFIG.laserWidth * 2.5 : GAME_CONFIG.laserWidth, // 2배 → 2.5배로 증가
-        height: GAME_CONFIG.laserHeight,
-        speed: GAME_CONFIG.laserSpeed,
+        width: isKrasthus ? config.laserWidth * 2.5 : config.laserWidth,
+        height: config.laserHeight,
+        speed: config.laserSpeed,
         type: type,
         isKrasthus: isKrasthus
     };
@@ -421,22 +614,25 @@ function createLaser(x, type) {
 function shootAllyLaser() {
     if (!playerUpgrades.hasAlly || allies.length === 0) return;
     
+    const config = getScaledConfig();
     const currentTime = Date.now();
-    if (currentTime - lastAllyLaserTime > GAME_CONFIG.laserCooldown) {
+    
+    if (currentTime - lastAllyLaserTime > config.laserCooldown) {
         const isKrasthus = playerUpgrades.krasthusLaser && currentTime < playerUpgrades.krasthusLaserEndTime;
-        const laserWidth = isKrasthus ? GAME_CONFIG.laserWidth * 2 : GAME_CONFIG.laserWidth;
+        const laserWidth = isKrasthus ? config.laserWidth * 2 : config.laserWidth;
+        const spacing12 = 12 * (canvas.width / 800);
+        const spacing8 = 8 * (canvas.width / 800);
         
         allies.forEach(ally => {
             let laserType = ally.color === 'purple' ? 'ally' : 'ally2';
             
             if (playerUpgrades.tripleLaser && currentTime < playerUpgrades.tripleLaserEndTime) {
-                // 동료도 트리플 레이저
                 lasers.push({
-                    x: ally.x + ally.width / 2 - laserWidth / 2 - 12,
+                    x: ally.x + ally.width / 2 - laserWidth / 2 - spacing12,
                     y: ally.y,
                     width: laserWidth,
-                    height: GAME_CONFIG.laserHeight,
-                    speed: GAME_CONFIG.laserSpeed,
+                    height: config.laserHeight,
+                    speed: config.laserSpeed,
                     type: laserType,
                     isKrasthus: isKrasthus
                 });
@@ -444,48 +640,46 @@ function shootAllyLaser() {
                     x: ally.x + ally.width / 2 - laserWidth / 2,
                     y: ally.y,
                     width: laserWidth,
-                    height: GAME_CONFIG.laserHeight,
-                    speed: GAME_CONFIG.laserSpeed,
+                    height: config.laserHeight,
+                    speed: config.laserSpeed,
                     type: laserType,
                     isKrasthus: isKrasthus
                 });
                 lasers.push({
-                    x: ally.x + ally.width / 2 - laserWidth / 2 + 12,
+                    x: ally.x + ally.width / 2 - laserWidth / 2 + spacing12,
                     y: ally.y,
                     width: laserWidth,
-                    height: GAME_CONFIG.laserHeight,
-                    speed: GAME_CONFIG.laserSpeed,
+                    height: config.laserHeight,
+                    speed: config.laserSpeed,
                     type: laserType,
                     isKrasthus: isKrasthus
                 });
             } else if (playerUpgrades.doubleLaser && currentTime < playerUpgrades.doubleLaserEndTime) {
-                // 동료도 더블 레이저
                 lasers.push({
-                    x: ally.x + ally.width / 2 - laserWidth / 2 - 8,
+                    x: ally.x + ally.width / 2 - laserWidth / 2 - spacing8,
                     y: ally.y,
                     width: laserWidth,
-                    height: GAME_CONFIG.laserHeight,
-                    speed: GAME_CONFIG.laserSpeed,
+                    height: config.laserHeight,
+                    speed: config.laserSpeed,
                     type: laserType,
                     isKrasthus: isKrasthus
                 });
                 lasers.push({
-                    x: ally.x + ally.width / 2 - laserWidth / 2 + 8,
+                    x: ally.x + ally.width / 2 - laserWidth / 2 + spacing8,
                     y: ally.y,
                     width: laserWidth,
-                    height: GAME_CONFIG.laserHeight,
-                    speed: GAME_CONFIG.laserSpeed,
+                    height: config.laserHeight,
+                    speed: config.laserSpeed,
                     type: laserType,
                     isKrasthus: isKrasthus
                 });
             } else {
-                // 동료 일반 레이저
                 lasers.push({
                     x: ally.x + ally.width / 2 - laserWidth / 2,
                     y: ally.y,
                     width: laserWidth,
-                    height: GAME_CONFIG.laserHeight,
-                    speed: GAME_CONFIG.laserSpeed,
+                    height: config.laserHeight,
+                    speed: config.laserSpeed,
                     type: laserType,
                     isKrasthus: isKrasthus
                 });
@@ -496,21 +690,19 @@ function shootAllyLaser() {
 }
 
 function spawnEnemies() {
+    const config = getScaledConfig();
     const currentTime = Date.now();
-    if (currentTime - lastEnemySpawn > GAME_CONFIG.enemySpawnRate) {
-        
-        // 보스가 있으면 일반 적 스폰 중단
+    
+    if (currentTime - lastEnemySpawn > config.enemySpawnRate) {
         const hasBoss = enemies.some(enemy => enemy.type === 'boss' || enemy.type === 'midBoss');
         if (hasBoss) {
             return;
         }
         
-        // 보스 처치 후 3초 동안 대기
         if (bossDefeatedTime > 0 && currentTime - bossDefeatedTime < 3000) {
             return;
         }
         
-        // 10레벨마다 보스, 5레벨마다 중간보스 체크
         if (gameStats.level % 10 === 0 && !bossSpawned[gameStats.level]) {
             startBossWarning('boss');
             return;
@@ -539,40 +731,42 @@ function spawnEnemies() {
 }
 
 function createEnemy(type) {
+    const config = getScaledConfig();
+    
     const enemy = {
-        x: Math.random() * (canvas.width - GAME_CONFIG.enemyWidth),
-        y: -GAME_CONFIG.enemyHeight,
-        width: GAME_CONFIG.enemyWidth,
-        height: GAME_CONFIG.enemyHeight,
+        x: Math.random() * (canvas.width - config.enemyWidth),
+        y: -config.enemyHeight,
+        width: config.enemyWidth,
+        height: config.enemyHeight,
         type: type,
         showHealthBar: false
     };
     
     switch (type) {
         case 'normal':
-            enemy.speed = GAME_CONFIG.enemySpeed * 0.5;
+            enemy.speed = config.enemySpeed * 0.5;
             enemy.points = 10;
             enemy.hp = 1;
             enemy.maxHp = 1;
             break;
         case 'fast':
-            enemy.speed = GAME_CONFIG.enemySpeed * 0.9;
+            enemy.speed = config.enemySpeed * 0.9;
             enemy.points = 20;
             enemy.hp = 1;
             enemy.maxHp = 1;
-            enemy.width = GAME_CONFIG.enemyWidth * 1.1;
-            enemy.height = GAME_CONFIG.enemyHeight * 1.1;
+            enemy.width = config.enemyWidth * 1.1;
+            enemy.height = config.enemyHeight * 1.1;
             break;
         case 'tank':
-            enemy.speed = GAME_CONFIG.enemySpeed * 0.6;
+            enemy.speed = config.enemySpeed * 0.6;
             enemy.points = 40;
             enemy.hp = 4;
             enemy.maxHp = 4;
-            enemy.width = GAME_CONFIG.enemyWidth * 1.3;
-            enemy.height = GAME_CONFIG.enemyHeight * 1.3;
+            enemy.width = config.enemyWidth * 1.3;
+            enemy.height = config.enemyHeight * 1.3;
             break;
         case 'gray':
-            enemy.speed = GAME_CONFIG.enemySpeed * 0.6;
+            enemy.speed = config.enemySpeed * 0.6;
             enemy.points = 15;
             enemy.hp = 3;
             enemy.maxHp = 3;
@@ -581,7 +775,6 @@ function createEnemy(type) {
     
     return enemy;
 }
-
 function startBossWarning(bossType) {
     gameState = 'bossWarning';
     currentBossType = bossType;
@@ -624,44 +817,43 @@ function startBossWarning(bossType) {
 }
 
 function spawnBoss(bossType) {
+    const config = getScaledConfig();
     bossSpawned[gameStats.level] = true;
     
     const boss = {
-        x: canvas.width / 2 - GAME_CONFIG.enemyWidth * 1.5 / 2,
-        y: -GAME_CONFIG.enemyHeight * 1.5,
+        x: canvas.width / 2 - config.enemyWidth * 1.5 / 2,
+        y: -config.enemyHeight * 1.5,
         type: bossType,
         showHealthBar: true,
         lastShot: 0
     };
     
     if (bossType === 'boss') {
-        // 보스 (10레벨마다) - 레벨에 따라 점진적 강화
-        const bossStage = Math.floor(gameStats.level / 10); // 1, 2, 3, 4...
+        const bossStage = Math.floor(gameStats.level / 10);
         
-        boss.width = GAME_CONFIG.enemyWidth * 2.3;
-        boss.height = GAME_CONFIG.enemyHeight * 2.3;
-        boss.speed = GAME_CONFIG.enemySpeed * 0.1;
+        boss.width = config.enemyWidth * 2.3;
+        boss.height = config.enemyHeight * 2.3;
+        boss.speed = config.enemySpeed * 0.1;
         boss.points = 120;
-        boss.hp = Math.min(100, 20 + Math.floor((bossStage - 1) / 2) * 2); // 5단계마다 1씩 증가, 최대 28
+        boss.hp = Math.min(100, 20 + Math.floor((bossStage - 1) / 2) * 2);
         boss.maxHp = boss.hp;
-        boss.shootCooldown = Math.max(400, 1500 - Math.floor((bossStage - 1) / 2) * 100); // 보스 - 1.5초에서 시작해서 2단계마다 0.1초씩 감소, 최소 0.4초
-        boss.bulletSpeed = Math.min(7, 4 + Math.floor((bossStage - 1) / 4) * 0.5); // 4단계마다 0.5 증가, 최대 7.0
+        boss.shootCooldown = Math.max(400, 1500 - Math.floor((bossStage - 1) / 2) * 100);
+        boss.bulletSpeed = Math.min(7, 4 + Math.floor((bossStage - 1) / 4) * 0.5) * (canvas.width / 800);
         boss.bulletCount = Math.min(12, 1 + Math.floor((bossStage - 1) / 2)); 
         boss.bossStage = bossStage;
         
         elements.gameInfo.textContent = `보스와의 결전입니다! (강화도: ${bossStage})`;
     } else {
-        // 중간보스 (5레벨마다) - 2단계마다 점진적 강화
-        const midBossStage = Math.floor(gameStats.level / 10); // 0, 1, 2, 3...
+        const midBossStage = Math.floor(gameStats.level / 10);
         
-        boss.width = GAME_CONFIG.enemyWidth * 1.5;
-        boss.height = GAME_CONFIG.enemyHeight * 1.5;
-        boss.speed = GAME_CONFIG.enemySpeed * 0.2;
+        boss.width = config.enemyWidth * 1.5;
+        boss.height = config.enemyHeight * 1.5;
+        boss.speed = config.enemySpeed * 0.2;
         boss.points = 80;
         boss.hp = Math.min(50, 12 + Math.floor(midBossStage / 2) * 1); 
         boss.maxHp = boss.hp;
-        boss.shootCooldown = Math.max(1000, 2500 - Math.floor(midBossStage / 2) * 200); // 중간보스 - 2.5초에서 시작해서 2단계마다 0.2초씩 감소, 최소 1초
-        boss.bulletSpeed = Math.min(5, 4 + midBossStage * 0.2); // 2단계마다 0.2 증가, 최대 5.0
+        boss.shootCooldown = Math.max(1000, 2500 - Math.floor(midBossStage / 2) * 200);
+        boss.bulletSpeed = Math.min(5, 4 + midBossStage * 0.2) * (canvas.width / 800);
         boss.bulletCount = Math.min(8, 1 + Math.floor(midBossStage / 2)); 
         boss.midBossStage = midBossStage;
         elements.gameInfo.textContent = `중간보스와의 대결입니다! (강화도: ${midBossStage})`;
@@ -744,6 +936,7 @@ function updateEnemies() {
 }
 
 function shootBossBullet(boss) {
+    const bulletSize = 10 * (canvas.width / 800);
     const bulletX = boss.x + boss.width / 2;
     const bulletY = boss.y + boss.height;
     const playerCenterX = player.x + player.width / 2;
@@ -752,39 +945,33 @@ function shootBossBullet(boss) {
     const dy = canvas.height - bulletY;
     const distance = Math.sqrt(dx * dx + dy * dy);
     
-    const speed = boss.bulletSpeed || 4;
+    const speed = boss.bulletSpeed || (4 * (canvas.width / 800));
     const bulletCount = boss.bulletCount || 1;
     
-    // 중간보스는 연속 발사 패턴
     if (boss.type === 'midBoss') {
-        // 플레이어를 향한 직선 연속 발사
         const vx = (dx / distance) * speed;
         const vy = (dy / distance) * speed;
         
         for (let i = 0; i < bulletCount; i++) {
             bossBullets.push({
-                x: bulletX - 5,
-                y: bulletY + (i * 15),
-                width: 10,
-                height: 10,
+                x: bulletX - bulletSize / 2,
+                y: bulletY + (i * 15 * (canvas.width / 800)),
+                width: bulletSize,
+                height: bulletSize,
                 vx: vx,
                 vy: vy,
-                bossType: boss.type  // 이 줄 추가
+                bossType: boss.type
             });
         }
     } else {
-        // 보스는 3가지 패턴을 순환
-        // 공격 패턴 결정 (보스마다 다른 패턴 카운터 유지)
         if (!boss.attackPattern) boss.attackPattern = 0;
-        boss.attackPattern = (boss.attackPattern + 1) % 3; // 0, 1, 2 사이에서 순환
+        boss.attackPattern = (boss.attackPattern + 1) % 3;
         
-        // 탄환 개수에 따라 발사
         for (let i = 0; i < bulletCount; i++) {
             let offsetX = 0;
             let offsetVx, offsetVy;
             
             if (boss.attackPattern === 0) {
-                // 패턴 1: 플레이어 중심 부채꼴 공격
                 const vx = (dx / distance) * speed;
                 const vy = (dy / distance) * speed;
                 
@@ -794,34 +981,32 @@ function shootBossBullet(boss) {
                     const sin = Math.sin(angleOffset);
                     offsetVx = vx * cos - vy * sin;
                     offsetVy = vx * sin + vy * cos;
-                    offsetX = (i - (bulletCount - 1) / 2) * 15;
+                    offsetX = (i - (bulletCount - 1) / 2) * 15 * (canvas.width / 800);
                 } else {
                     offsetVx = vx;
                     offsetVy = vy;
                 }
             } else if (boss.attackPattern === 1) {
-                // 패턴 2: 플레이어를 향한 직선 연속 공격 (중간보스와 동일)
                 const vx = (dx / distance) * speed;
                 const vy = (dy / distance) * speed;
                 offsetVx = vx;
                 offsetVy = vy;
-                offsetX = 0; // 직선이므로 위치 오프셋 없음
+                offsetX = 0;
             } else {
-                // 패턴 3: 랜덤 방향 공격
                 const randomAngle = Math.random() * Math.PI * 2;
                 offsetVx = Math.cos(randomAngle) * speed;
                 offsetVy = Math.sin(randomAngle) * speed;
-                offsetX = (Math.random() - 0.5) * 30; // 발사 위치도 약간 랜덤
+                offsetX = (Math.random() - 0.5) * 30 * (canvas.width / 800);
             }
             
             bossBullets.push({
-                x: bulletX - 5 + offsetX,
+                x: bulletX - bulletSize / 2 + offsetX,
                 y: bulletY,
-                width: 10,
-                height: 10,
+                width: bulletSize,
+                height: bulletSize,
                 vx: offsetVx,
                 vy: offsetVy,
-                bossType: boss.type  // 이 줄 추가
+                bossType: boss.type
             });
         }
     }
@@ -886,34 +1071,33 @@ function updateItems() {
 }
 
 function updateAllies() {
+    const scale = canvas.width / 800;
+    
     if (playerUpgrades.hasAlly && allies.length > 0) {
         allies.forEach(ally => {
             if (ally.isMovingToPosition) {
-                // 초기 등장: 빠르게 목표 위치로 이동
                 const dx = ally.targetX - ally.x;
                 const dy = ally.targetY - ally.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                if (distance > 5) {
-                    const speed = 8;
+                if (distance > 5 * scale) {
+                    const speed = 6 * scale;
                     ally.x += (dx / distance) * speed;
                     ally.y += (dy / distance) * speed;
                 } else {
-                    // 목표 위치 도달
                     ally.isMovingToPosition = false;
                     ally.x = ally.targetX;
                     ally.y = ally.targetY;
                 }
             } else {
-                // 일반 상태: 플레이어 따라다니기
                 let targetX, targetY;
                 
                 if (ally.side === 'left') {
-                    targetX = player.x - 60;
-                    targetY = player.y + 10;
-                } else { // right
-                    targetX = player.x + player.width + 60;
-                    targetY = player.y + 10;
+                    targetX = player.x - 60 * scale;
+                    targetY = player.y + 10 * scale;
+                } else {
+                    targetX = player.x + player.width + 60 * scale;
+                    targetY = player.y + 10 * scale;
                 }
                 
                 ally.x += (targetX - ally.x) * 0.1;
@@ -924,10 +1108,13 @@ function updateAllies() {
 }
 
 function applyItemEffect(item) {
+    const config = getScaledConfig();
+    const scale = canvas.width / 800;
+    
     switch (item.type) {
         case 'doubleLaser':
             if (playerUpgrades.tripleLaser && Date.now() < playerUpgrades.tripleLaserEndTime) {
-                return; // 트리플 레이저가 활성화되어 있으면 무시
+                return;
             }
             playerUpgrades.doubleLaser = true;
             playerUpgrades.doubleLaserEndTime = Date.now() + 15000;
@@ -941,7 +1128,7 @@ function applyItemEffect(item) {
         case 'tripleLaser':
             playerUpgrades.tripleLaser = true;
             playerUpgrades.tripleLaserEndTime = Date.now() + 10000;
-            playerUpgrades.doubleLaser = false; // 기존 더블 레이저 비활성화
+            playerUpgrades.doubleLaser = false;
             elements.gameInfo.textContent = '🔥 트리플 레이저 획득! (10초간) 🔥';
             setTimeout(() => {
                 if (gameState === 'playing') {
@@ -952,34 +1139,31 @@ function applyItemEffect(item) {
         case 'extraLife':
             gameStats.lives += 3;
             
-            // 최대 2개의 동료 우주선까지 가능
             if (allies.length < 2) {
                 playerUpgrades.hasAlly = true;
                 
                 if (allies.length === 0) {
-                    // 첫 번째 동료 (연보라색, 왼쪽에서 등장)
                     allies.push({
-                        x: -100,
-                        y: player.y + 10,
-                        width: GAME_CONFIG.playerWidth * 0.8,
-                        height: GAME_CONFIG.playerHeight * 0.8,
-                        targetX: player.x - 60,
-                        targetY: player.y + 10,
+                        x: -100 * scale,
+                        y: player.y + 10 * scale,
+                        width: config.playerWidth * 0.8,
+                        height: config.playerHeight * 0.8,
+                        targetX: player.x - 60 * scale,
+                        targetY: player.y + 10 * scale,
                         isMovingToPosition: true,
-                        color: 'purple', // 연보라색
+                        color: 'purple',
                         side: 'left'
                     });
                 } else if (allies.length === 1) {
-                    // 두 번째 동료 (연한 베이지색, 오른쪽에서 등장)
                     allies.push({
-                        x: canvas.width + 100,
-                        y: player.y + 10,
-                        width: GAME_CONFIG.playerWidth * 0.8,
-                        height: GAME_CONFIG.playerHeight * 0.8,
-                        targetX: player.x + player.width + 60,
-                        targetY: player.y + 10,
+                        x: canvas.width + 100 * scale,
+                        y: player.y + 10 * scale,
+                        width: config.playerWidth * 0.8,
+                        height: config.playerHeight * 0.8,
+                        targetX: player.x + player.width + 60 * scale,
+                        targetY: player.y + 10 * scale,
                         isMovingToPosition: true,
-                        color: 'beige', // 연한 베이지색
+                        color: 'beige',
                         side: 'right'
                     });
                 }
@@ -1000,7 +1184,6 @@ function applyItemEffect(item) {
                     }
                 }, 2000);
             } else {
-                // 이미 2개의 동료가 있을 때
                 elements.gameInfo.textContent = '❤️ 생명 +2 획득! ❤️';
                 setTimeout(() => {
                     if (gameState === 'playing') {
@@ -1150,7 +1333,9 @@ function checkCollisions() {
 }
 
 function handleEnemyDeath(enemy, index) {
-    // 점수 및 통계 업데이트
+    const config = getScaledConfig();
+    const scale = canvas.width / 800;
+    
     gameStats.score += enemy.points + (gameStats.combo * 3);
     gameStats.enemiesKilled++;
     gameStats.combo++;
@@ -1161,16 +1346,14 @@ function handleEnemyDeath(enemy, index) {
     localStorage.setItem('spaceshipTotalEnemies', allTimeStats.totalEnemiesKilled);
     localStorage.setItem('spaceshipMaxCombo', allTimeStats.maxComboRecord);
     
-    // 아이템 드롭
     if (enemy.type === 'gray') {
-        items.push(createItem(enemy.x + enemy.width / 2 - 10, enemy.y + enemy.height / 2, 'doubleLaser'));
+        items.push(createItem(enemy.x + enemy.width / 2 - 10 * scale, enemy.y + enemy.height / 2, 'doubleLaser'));
     }
     
     if (enemy.type === 'midBoss') {
-        // 중간보스 처치 시 생명 1개 증가 + 크라스투스 레이저 업그레이드 (20초)
         gameStats.lives += 1;
         playerUpgrades.krasthusLaser = true;
-        playerUpgrades.krasthusLaserEndTime = Date.now() + 20000; // 20초 지속
+        playerUpgrades.krasthusLaserEndTime = Date.now() + 20000;
         
         elements.gameInfo.textContent = '⚔️ 중간보스 격파! 생명 +1, 크라스투스 레이저 획득! ⚔️';
         setTimeout(() => {
@@ -1181,57 +1364,51 @@ function handleEnemyDeath(enemy, index) {
     }
     
     if (enemy.type === 'boss') {
-    // 보스 처치 시 생명 1개만 증가
-    gameStats.lives += 1;
-    
-    // 트리플 레이저만 별도로 적용
-    playerUpgrades.tripleLaser = true;
-    playerUpgrades.tripleLaserEndTime = Date.now() + 10000; // 10초 
-    playerUpgrades.doubleLaser = false; // 기존 더블 레이저 비활성화
-    
-    // 동료 우주선 추가 (생명 증가 없이)
-    if (allies.length < 2) {
-        playerUpgrades.hasAlly = true;
+        gameStats.lives += 1;
         
-        if (allies.length === 0) {
-            // 첫 번째 동료 추가
-            allies.push({
-                x: -100,
-                y: player.y + 10,
-                width: GAME_CONFIG.playerWidth * 0.8,
-                height: GAME_CONFIG.playerHeight * 0.8,
-                targetX: player.x - 60,
-                targetY: player.y + 10,
-                isMovingToPosition: true,
-                color: 'purple',
-                side: 'left'
-            });
-        } else if (allies.length === 1) {
-            // 두 번째 동료 추가
-            allies.push({
-                x: canvas.width + 100,
-                y: player.y + 10,
-                width: GAME_CONFIG.playerWidth * 0.8,
-                height: GAME_CONFIG.playerHeight * 0.8,
-                targetX: player.x + player.width + 60,
-                targetY: player.y + 10,
-                isMovingToPosition: true,
-                color: 'beige',
-                side: 'right'
-            });
+        playerUpgrades.tripleLaser = true;
+        playerUpgrades.tripleLaserEndTime = Date.now() + 10000;
+        playerUpgrades.doubleLaser = false;
+        
+        if (allies.length < 2) {
+            playerUpgrades.hasAlly = true;
+            
+            if (allies.length === 0) {
+                allies.push({
+                    x: -100 * scale,
+                    y: player.y + 10 * scale,
+                    width: config.playerWidth * 0.8,
+                    height: config.playerHeight * 0.8,
+                    targetX: player.x - 60 * scale,
+                    targetY: player.y + 10 * scale,
+                    isMovingToPosition: true,
+                    color: 'purple',
+                    side: 'left'
+                });
+            } else if (allies.length === 1) {
+                allies.push({
+                    x: canvas.width + 100 * scale,
+                    y: player.y + 10 * scale,
+                    width: config.playerWidth * 0.8,
+                    height: config.playerHeight * 0.8,
+                    targetX: player.x + player.width + 60 * scale,
+                    targetY: player.y + 10 * scale,
+                    isMovingToPosition: true,
+                    color: 'beige',
+                    side: 'right'
+                });
+            }
         }
+        
+        bossDefeatedTime = Date.now();
+        
+        elements.gameInfo.textContent = '💀 보스 격파! 생명 +1, 트리플 레이저 & 동료 획득! 💀';
+        setTimeout(() => {
+            if (gameState === 'playing') {
+                elements.gameInfo.textContent = '트리플 레이저와 동료 우주선으로 무적 상태!';
+            }
+        }, 3000);
     }
-    
-    // 보스 처치 시간 기록
-    bossDefeatedTime = Date.now();
-    
-    elements.gameInfo.textContent = '💀 보스 격파! 생명 +1, 트리플 레이저 & 동료 획득! 💀';
-    setTimeout(() => {
-        if (gameState === 'playing') {
-            elements.gameInfo.textContent = '트리플 레이저와 동료 우주선으로 무적 상태!';
-        }
-    }, 3000);
-}
     
     // 폭발 효과 생성
     let explosionSize = 1;
@@ -1250,19 +1427,21 @@ function handleEnemyDeath(enemy, index) {
 }
 
 function createItem(x, y, type) {
+    const scale = canvas.width / 800;
+    
     const item = {
         x: x,
         y: y,
-        speed: type === 'extraLife' ? 2 : 3,
+        speed: (type === 'extraLife' ? 2 : 3) * scale,
         type: type
     };
     
     if (type === 'doubleLaser' || type === 'tripleLaser') {
-        item.width = 20;
-        item.height = 20;
+        item.width = 20 * scale;
+        item.height = 20 * scale;
     } else {
-        item.width = 24;
-        item.height = 24;
+        item.width = 24 * scale;
+        item.height = 24 * scale;
     }
     
     return item;
@@ -1519,70 +1698,75 @@ function draw() {
     drawBossBullets();
     
     if (gameStats.combo > 1) {
+        const scale = canvas.width / 800;
         ctx.fillStyle = '#ffff00';
-        ctx.font = 'bold 18px Orbitron';
+        ctx.font = `bold ${18 * scale}px Orbitron`;
         ctx.textAlign = 'center';
-        ctx.fillText(`COMBO x${gameStats.combo}!`, canvas.width/2, 30);
+        ctx.fillText(`COMBO x${gameStats.combo}!`, canvas.width/2, 30 * scale);
         ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 2;
-        ctx.strokeText(`COMBO x${gameStats.combo}!`, canvas.width/2, 30);
+        ctx.lineWidth = 2 * scale;
+        ctx.strokeText(`COMBO x${gameStats.combo}!`, canvas.width/2, 30 * scale);
     }
     
     drawUpgradeStatus();
 }
 
 function drawStars() {
+    const scale = canvas.width / 800;
+    
     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
     for (let i = 0; i < 80; i++) {
         const x = (i * 97) % canvas.width;
         const y = (Date.now() * 0.02 + i * 314) % canvas.height;
-        const size = Math.random() < 0.1 ? 2 : 1;
+        const size = (Math.random() < 0.1 ? 2 : 1) * scale;
         ctx.fillRect(x, y, size, size);
     }
 }
 
 function drawPlayer() {
-    if (gameState === 'gameOver') return; // 게임 오버 시 플레이어 안 그리기
+    if (gameState === 'gameOver') return;
+    
+    const scale = canvas.width / 800;
     
     ctx.shadowColor = '#00FFFF';
-    ctx.shadowBlur = 15;
+    ctx.shadowBlur = 15 * scale;
     
     const centerX = player.x + player.width / 2;
     
     ctx.fillStyle = '#00FFFF';
     ctx.beginPath();
     ctx.moveTo(centerX, player.y);
-    ctx.lineTo(player.x + 5, player.y + player.height);
-    ctx.lineTo(player.x + player.width - 5, player.y + player.height);
+    ctx.lineTo(player.x + 5 * scale, player.y + player.height);
+    ctx.lineTo(player.x + player.width - 5 * scale, player.y + player.height);
     ctx.closePath();
     ctx.fill();
     
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.moveTo(centerX, player.y + 5);
-    ctx.lineTo(centerX - 8, player.y + player.height - 8);
-    ctx.lineTo(centerX + 8, player.y + player.height - 8);
+    ctx.moveTo(centerX, player.y + 5 * scale);
+    ctx.lineTo(centerX - 8 * scale, player.y + player.height - 8 * scale);
+    ctx.lineTo(centerX + 8 * scale, player.y + player.height - 8 * scale);
     ctx.closePath();
     ctx.fill();
     
     ctx.fillStyle = '#0088FF';
-    ctx.fillRect(player.x - 2, player.y + player.height * 0.6, 6, player.height * 0.3);
-    ctx.fillRect(player.x + player.width - 4, player.y + player.height * 0.6, 6, player.height * 0.3);
+    ctx.fillRect(player.x - 2 * scale, player.y + player.height * 0.6, 6 * scale, player.height * 0.3);
+    ctx.fillRect(player.x + player.width - 4 * scale, player.y + player.height * 0.6, 6 * scale, player.height * 0.3);
     
     if (gameState === 'playing') {
         ctx.fillStyle = '#FF6600';
-        const mainFlameHeight = 10 + Math.random() * 6;
+        const mainFlameHeight = (10 + Math.random() * 6) * scale;
         ctx.beginPath();
-        ctx.moveTo(centerX - 6, player.y + player.height);
+        ctx.moveTo(centerX - 6 * scale, player.y + player.height);
         ctx.lineTo(centerX, player.y + player.height + mainFlameHeight);
-        ctx.lineTo(centerX + 6, player.y + player.height);
+        ctx.lineTo(centerX + 6 * scale, player.y + player.height);
         ctx.closePath();
         ctx.fill();
         
         ctx.fillStyle = '#FF8800';
-        const sideFlameHeight = 6 + Math.random() * 3;
-        ctx.fillRect(player.x - 1, player.y + player.height * 0.9, 4, sideFlameHeight);
-        ctx.fillRect(player.x + player.width - 3, player.y + player.height * 0.9, 4, sideFlameHeight);
+        const sideFlameHeight = (6 + Math.random() * 3) * scale;
+        ctx.fillRect(player.x - 1 * scale, player.y + player.height * 0.9, 4 * scale, sideFlameHeight);
+        ctx.fillRect(player.x + player.width - 3 * scale, player.y + player.height * 0.9, 4 * scale, sideFlameHeight);
     }
     
     ctx.shadowBlur = 0;
@@ -1591,65 +1775,60 @@ function drawPlayer() {
 function drawAllies() {
     if (!playerUpgrades.hasAlly) return;
     
+    const scale = canvas.width / 800;
+    
     allies.forEach(ally => {
         let mainColor, glowColor, flameColor;
         
         if (ally.color === 'purple') {
-            // 첫 번째 동료 - 연보라색
             mainColor = '#BB88FF';
             glowColor = '#BB88FF';
             flameColor = '#FF6600';
         } else {
-            // 두 번째 동료 - 연한 베이지색
             mainColor = '#F5E6B8';
             glowColor = '#F5E6B8';
             flameColor = '#FF6600';
         }
         
         ctx.shadowColor = glowColor;
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 10 * scale;
         
         const centerX = ally.x + ally.width / 2;
         
-        // 메인 우주선 모양 (플레이어와 동일한 삼각형 모양)
         ctx.fillStyle = mainColor;
         ctx.beginPath();
         ctx.moveTo(centerX, ally.y);
-        ctx.lineTo(ally.x + 4, ally.y + ally.height);
-        ctx.lineTo(ally.x + ally.width - 4, ally.y + ally.height);
+        ctx.lineTo(ally.x + 4 * scale, ally.y + ally.height);
+        ctx.lineTo(ally.x + ally.width - 4 * scale, ally.y + ally.height);
         ctx.closePath();
         ctx.fill();
         
-        // 내부 흰색 삼각형
         ctx.fillStyle = '#FFFFFF';
         ctx.beginPath();
-        ctx.moveTo(centerX, ally.y + 4);
-        ctx.lineTo(centerX - 6, ally.y + ally.height - 6);
-        ctx.lineTo(centerX + 6, ally.y + ally.height - 6);
+        ctx.moveTo(centerX, ally.y + 4 * scale);
+        ctx.lineTo(centerX - 6 * scale, ally.y + ally.height - 6 * scale);
+        ctx.lineTo(centerX + 6 * scale, ally.y + ally.height - 6 * scale);
         ctx.closePath();
         ctx.fill();
         
-        // 좌우 날개 부분
         ctx.fillStyle = mainColor;
-        ctx.fillRect(ally.x - 2, ally.y + ally.height * 0.6, 5, ally.height * 0.3);
-        ctx.fillRect(ally.x + ally.width - 3, ally.y + ally.height * 0.6, 5, ally.height * 0.3);
+        ctx.fillRect(ally.x - 2 * scale, ally.y + ally.height * 0.6, 5 * scale, ally.height * 0.3);
+        ctx.fillRect(ally.x + ally.width - 3 * scale, ally.y + ally.height * 0.6, 5 * scale, ally.height * 0.3);
         
         if (gameState === 'playing') {
-            // 메인 엔진 화염
             ctx.fillStyle = flameColor;
-            const flameHeight = 8 + Math.random() * 4;
+            const flameHeight = (8 + Math.random() * 4) * scale;
             ctx.beginPath();
-            ctx.moveTo(centerX - 5, ally.y + ally.height);
+            ctx.moveTo(centerX - 5 * scale, ally.y + ally.height);
             ctx.lineTo(centerX, ally.y + ally.height + flameHeight);
-            ctx.lineTo(centerX + 5, ally.y + ally.height);
+            ctx.lineTo(centerX + 5 * scale, ally.y + ally.height);
             ctx.closePath();
             ctx.fill();
             
-            // 사이드 엔진 화염
             ctx.fillStyle = '#FF8800';
-            const sideFlameHeight = 5 + Math.random() * 2;
-            ctx.fillRect(ally.x - 1, ally.y + ally.height * 0.9, 3, sideFlameHeight);
-            ctx.fillRect(ally.x + ally.width - 2, ally.y + ally.height * 0.9, 3, sideFlameHeight);
+            const sideFlameHeight = (5 + Math.random() * 2) * scale;
+            ctx.fillRect(ally.x - 1 * scale, ally.y + ally.height * 0.9, 3 * scale, sideFlameHeight);
+            ctx.fillRect(ally.x + ally.width - 2 * scale, ally.y + ally.height * 0.9, 3 * scale, sideFlameHeight);
         }
         
         ctx.shadowBlur = 0;
@@ -1657,7 +1836,8 @@ function drawAllies() {
 }
 
 function drawLasers() {
-    ctx.shadowBlur = 8;
+    const scale = canvas.width / 800;
+    ctx.shadowBlur = 8 * scale;
     
     lasers.forEach(laser => {
         let fillColor, shadowColor;
@@ -1672,11 +1852,11 @@ function drawLasers() {
                 shadowColor = '#00FFFF';
                 break;
             case 'ally':
-                fillColor = '#BB88FF';  // 첫 번째 동료 레이저 (연보라색)
+                fillColor = '#BB88FF';
                 shadowColor = '#BB88FF';
                 break;
             case 'ally2':
-                fillColor = '#F5E6B8';  // 두 번째 동료 레이저 (연한 베이지색)
+                fillColor = '#F5E6B8';
                 shadowColor = '#F5E6B8';
                 break;
             default:
@@ -1685,17 +1865,15 @@ function drawLasers() {
                 break;
         }
         
-        // 크라스투스 레이저일 때 그림자 효과 강화
         if (laser.isKrasthus) {
-            ctx.shadowBlur = 20; // 15 → 20으로 증가
+            ctx.shadowBlur = 20 * scale;
             ctx.fillStyle = '#FF3333'; 
             ctx.shadowColor = '#FF3333';
             ctx.fillRect(laser.x, laser.y, laser.width, laser.height);
             
-            // 중앙 밝은 코어
             ctx.fillStyle = '#FF6666'; 
             ctx.shadowColor = '#FF6666';
-            ctx.shadowBlur = 8;
+            ctx.shadowBlur = 8 * scale;
             ctx.fillRect(laser.x + laser.width/4, laser.y, laser.width/2, laser.height);
         } else {
             ctx.fillStyle = fillColor;
@@ -1708,23 +1886,23 @@ function drawLasers() {
 }
 
 function drawBossBullets() {
+    const scale = canvas.width / 800;
+    
     bossBullets.forEach(bullet => {
         let shadowColor, outerColor, innerColor;
         
         if (bullet.bossType === 'midBoss') {
-            // 중간보스 색상 (회색)
             shadowColor = '#888888';
             outerColor = '#888888';
             innerColor = '#CCCCCC';
         } else {
-            // 보스 색상 (흰색)
             shadowColor = '#FFFFFF';
             outerColor = '#FFFFFF';
             innerColor = '#EEEEEE';
         }
         
         ctx.shadowColor = shadowColor;
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 10 * scale;
         
         ctx.fillStyle = outerColor;
         ctx.beginPath();
@@ -1740,13 +1918,16 @@ function drawBossBullets() {
     ctx.shadowBlur = 0;
 }
 
+// drawEnemies 함수 수정
 function drawEnemies() {
+    const scale = canvas.width / 800;
+    
     enemies.forEach(enemy => {
         if (enemy.hitEffect > 0) {
             enemy.hitEffect--;
-            ctx.shadowBlur = 20;
+            ctx.shadowBlur = 20 * scale;
         } else {
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 10 * scale;
         }
         
         let shadowColor, fillColor;
@@ -1795,11 +1976,11 @@ function drawEnemies() {
         ctx.fill();
         
         ctx.strokeStyle = fillColor;
-        let lineWidth = 4;
-        if (enemy.type === 'tank') lineWidth = 6;
-        else if (enemy.type === 'gray') lineWidth = 5;
-        else if (enemy.type === 'midBoss') lineWidth = 8;
-        else if (enemy.type === 'boss') lineWidth = 10;
+        let lineWidth = 4 * scale;
+        if (enemy.type === 'tank') lineWidth = 6 * scale;
+        else if (enemy.type === 'gray') lineWidth = 5 * scale;
+        else if (enemy.type === 'midBoss') lineWidth = 8 * scale;
+        else if (enemy.type === 'boss') lineWidth = 10 * scale;
         
         ctx.lineWidth = lineWidth;
         ctx.lineCap = 'round';
@@ -1813,20 +1994,20 @@ function drawEnemies() {
         for(let i = 0; i < tentacleCount; i++) {
             const startX = centerX + (i - Math.floor(tentacleCount/2)) * enemy.width * 0.12;
             const startY = centerY + bodySize;
-            const endX = startX + Math.sin(Date.now() * 0.01 + i) * 8;
+            const endX = startX + Math.sin(Date.now() * 0.01 + i) * 8 * scale;
             const endY = startY + enemy.height * 0.35;
             
             ctx.beginPath();
             ctx.moveTo(startX, startY);
-            ctx.quadraticCurveTo(startX + Math.sin(Date.now() * 0.008 + i) * 10, startY + enemy.height * 0.17, endX, endY);
+            ctx.quadraticCurveTo(startX + Math.sin(Date.now() * 0.008 + i) * 10 * scale, startY + enemy.height * 0.17, endX, endY);
             ctx.stroke();
             
             ctx.fillStyle = '#FFFFFF';
             ctx.beginPath();
-            let endSize = 2;
-            if (enemy.type === 'tank') endSize = 3;
-            else if (enemy.type === 'midBoss') endSize = 4;
-            else if (enemy.type === 'boss') endSize = 5;
+            let endSize = 2 * scale;
+            if (enemy.type === 'tank') endSize = 3 * scale;
+            else if (enemy.type === 'midBoss') endSize = 4 * scale;
+            else if (enemy.type === 'boss') endSize = 5 * scale;
             ctx.arc(endX, endY, endSize, 0, 2 * Math.PI);
             ctx.fill();
         }
@@ -1845,11 +2026,11 @@ function drawEnemies() {
             const eyeY = centerY + Math.sin(angle) * eyeDistance * 0.5;
             
             ctx.beginPath();
-            let eyeSize = 3;
-            if (enemy.type === 'tank') eyeSize = 4;
-            else if (enemy.type === 'gray') eyeSize = 3.5;
-            else if (enemy.type === 'midBoss') eyeSize = 5;
-            else if (enemy.type === 'boss') eyeSize = 6;
+            let eyeSize = 3 * scale;
+            if (enemy.type === 'tank') eyeSize = 4 * scale;
+            else if (enemy.type === 'gray') eyeSize = 3.5 * scale;
+            else if (enemy.type === 'midBoss') eyeSize = 5 * scale;
+            else if (enemy.type === 'boss') eyeSize = 6 * scale;
             ctx.arc(eyeX, eyeY, eyeSize, 0, 2 * Math.PI);
             ctx.fill();
         }
@@ -1862,6 +2043,8 @@ function drawEnemies() {
 }
 
 function drawItems() {
+    const scale = canvas.width / 800;
+    
     items.forEach(item => {
         ctx.save();
         
@@ -1872,19 +2055,19 @@ function drawItems() {
                 ctx.rotate(rotation);
                 
                 ctx.shadowColor = '#00FFFF';
-                ctx.shadowBlur = 15;
+                ctx.shadowBlur = 15 * scale;
                 
                 ctx.fillStyle = '#00FFFF';
                 ctx.fillRect(-item.width/2, -item.height/2, item.width, item.height);
                 
                 ctx.fillStyle = '#FFFFFF';
-                ctx.fillRect(-6, -8, 3, 16);
-                ctx.fillRect(3, -8, 3, 16);
+                ctx.fillRect(-6 * scale, -8 * scale, 3 * scale, 16 * scale);
+                ctx.fillRect(3 * scale, -8 * scale, 3 * scale, 16 * scale);
                 
-                ctx.fillRect(-8, -10, 7, 4);
-                ctx.fillRect(-8, 6, 7, 4);
-                ctx.fillRect(1, -10, 7, 4);
-                ctx.fillRect(1, 6, 7, 4);
+                ctx.fillRect(-8 * scale, -10 * scale, 7 * scale, 4 * scale);
+                ctx.fillRect(-8 * scale, 6 * scale, 7 * scale, 4 * scale);
+                ctx.fillRect(1 * scale, -10 * scale, 7 * scale, 4 * scale);
+                ctx.fillRect(1 * scale, 6 * scale, 7 * scale, 4 * scale);
                 break;
                 
             case 'tripleLaser':
@@ -1893,22 +2076,22 @@ function drawItems() {
                 ctx.rotate(rotation3);
                 
                 ctx.shadowColor = '#FFFFFF';
-                ctx.shadowBlur = 25;
+                ctx.shadowBlur = 25 * scale;
                 
                 ctx.fillStyle = '#FFFFFF';
                 ctx.fillRect(-item.width/2, -item.height/2, item.width, item.height);
                 
                 ctx.fillStyle = '#000000';
-                ctx.fillRect(-8, -8, 2, 16);
-                ctx.fillRect(0, -8, 2, 16);
-                ctx.fillRect(8, -8, 2, 16);
+                ctx.fillRect(-8 * scale, -8 * scale, 2 * scale, 16 * scale);
+                ctx.fillRect(0, -8 * scale, 2 * scale, 16 * scale);
+                ctx.fillRect(8 * scale, -8 * scale, 2 * scale, 16 * scale);
                 
-                ctx.fillRect(-10, -10, 6, 3);
-                ctx.fillRect(-10, 7, 6, 3);
-                ctx.fillRect(-2, -10, 6, 3);
-                ctx.fillRect(-2, 7, 6, 3);
-                ctx.fillRect(6, -10, 6, 3);
-                ctx.fillRect(6, 7, 6, 3);
+                ctx.fillRect(-10 * scale, -10 * scale, 6 * scale, 3 * scale);
+                ctx.fillRect(-10 * scale, 7 * scale, 6 * scale, 3 * scale);
+                ctx.fillRect(-2 * scale, -10 * scale, 6 * scale, 3 * scale);
+                ctx.fillRect(-2 * scale, 7 * scale, 6 * scale, 3 * scale);
+                ctx.fillRect(6 * scale, -10 * scale, 6 * scale, 3 * scale);
+                ctx.fillRect(6 * scale, 7 * scale, 6 * scale, 3 * scale);
                 break;
                 
             case 'extraLife':
@@ -1917,7 +2100,7 @@ function drawItems() {
                 ctx.rotate(rotation2);
                 
                 ctx.shadowColor = '#00FF00';
-                ctx.shadowBlur = 20;
+                ctx.shadowBlur = 20 * scale;
                 
                 ctx.fillStyle = '#00FF00';
                 
@@ -1948,10 +2131,12 @@ function drawItems() {
 }
 
 function drawHealthBar(enemy) {
+    const scale = canvas.width / 800;
+    
     const barWidth = enemy.width;
-    const barHeight = 6;
+    const barHeight = 6 * scale;
     const barX = enemy.x;
-    const barY = enemy.y - 12;
+    const barY = enemy.y - 12 * scale;
     
     ctx.fillStyle = '#FF0000';
     ctx.fillRect(barX, barY, barWidth, barHeight);
@@ -1961,61 +2146,60 @@ function drawHealthBar(enemy) {
     ctx.fillRect(barX, barY, barWidth * healthPercent, barHeight);
     
     ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1 * scale;
     ctx.strokeRect(barX, barY, barWidth, barHeight);
 }
-
 function drawUpgradeStatus() {
-    let yOffset = canvas.height - 10;
+    const scale = canvas.width / 800;
+    let yOffset = canvas.height - 10 * scale;
     
     if (playerUpgrades.tripleLaser && Date.now() < playerUpgrades.tripleLaserEndTime) {
         const timeLeft = Math.ceil((playerUpgrades.tripleLaserEndTime - Date.now()) / 1000);
         
         ctx.save();
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 14px Orbitron';
+        ctx.font = `bold ${14 * scale}px Orbitron`;
         ctx.textAlign = 'left';
-        ctx.fillText(`트리플 레이저: ${timeLeft}초`, 10, yOffset);
+        ctx.fillText(`트리플 레이저: ${timeLeft}초`, 10 * scale, yOffset);
         
         ctx.strokeStyle = '#CCCCCC';
-        ctx.lineWidth = 2;
-        ctx.strokeText(`트리플 레이저: ${timeLeft}초`, 10, yOffset);
+        ctx.lineWidth = 2 * scale;
+        ctx.strokeText(`트리플 레이저: ${timeLeft}초`, 10 * scale, yOffset);
         ctx.restore();
         
-        yOffset -= 20;
+        yOffset -= 20 * scale;
     } else if (playerUpgrades.doubleLaser && Date.now() < playerUpgrades.doubleLaserEndTime) {
         const timeLeft = Math.ceil((playerUpgrades.doubleLaserEndTime - Date.now()) / 1000);
         
         ctx.save();
         ctx.fillStyle = '#00FFFF';
-        ctx.font = 'bold 14px Orbitron';
+        ctx.font = `bold ${14 * scale}px Orbitron`;
         ctx.textAlign = 'left';
-        ctx.fillText(`더블 레이저: ${timeLeft}초`, 10, yOffset);
+        ctx.fillText(`더블 레이저: ${timeLeft}초`, 10 * scale, yOffset);
         
         ctx.strokeStyle = '#97f0f7ff';
-        ctx.lineWidth = 2;
-        ctx.strokeText(`더블 레이저: ${timeLeft}초`, 10, yOffset);
+        ctx.lineWidth = 2 * scale;
+        ctx.strokeText(`더블 레이저: ${timeLeft}초`, 10 * scale, yOffset);
         ctx.restore();
         
-        yOffset -= 20;
+        yOffset -= 20 * scale;
     }
     
-    // 크라스투스 레이저 상태 표시 (새로운 색상 적용)
     if (playerUpgrades.krasthusLaser && Date.now() < playerUpgrades.krasthusLaserEndTime) {
         const timeLeft = Math.ceil((playerUpgrades.krasthusLaserEndTime - Date.now()) / 1000);
         
         ctx.save();
-        ctx.fillStyle = '#FF6666';  // 레이저와 동일한 진한 빨강
-        ctx.font = 'bold 14px Orbitron';
+        ctx.fillStyle = '#FF6666';
+        ctx.font = `bold ${14 * scale}px Orbitron`;
         ctx.textAlign = 'left';
-        ctx.fillText(`크라스투스 레이저: ${timeLeft}초`, 10, yOffset);
+        ctx.fillText(`크라스투스 레이저: ${timeLeft}초`, 10 * scale, yOffset);
         
-        ctx.strokeStyle = '#DD3333';  // 더 진한 빨강 테두리
-        ctx.lineWidth = 2;
-        ctx.strokeText(`크라스투스 레이저: ${timeLeft}초`, 10, yOffset);
+        ctx.strokeStyle = '#DD3333';
+        ctx.lineWidth = 2 * scale;
+        ctx.strokeText(`크라스투스 레이저: ${timeLeft}초`, 10 * scale, yOffset);
         ctx.restore();
         
-        yOffset -= 20;
+        yOffset -= 20 * scale;
     }
     
     if (playerUpgrades.hasAlly) {
@@ -2028,13 +2212,13 @@ function drawUpgradeStatus() {
         
         ctx.save();
         ctx.fillStyle = '#BB88FF';
-        ctx.font = 'bold 14px Orbitron';
+        ctx.font = `bold ${14 * scale}px Orbitron`;
         ctx.textAlign = 'left';
-        ctx.fillText(allyText, 10, yOffset);
+        ctx.fillText(allyText, 10 * scale, yOffset);
         
         ctx.strokeStyle = '#9966CC';
-        ctx.lineWidth = 2;
-        ctx.strokeText(allyText, 10, yOffset);
+        ctx.lineWidth = 2 * scale;
+        ctx.strokeText(allyText, 10 * scale, yOffset);
         ctx.restore();
     }
 }
