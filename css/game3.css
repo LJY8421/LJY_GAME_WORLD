@@ -794,8 +794,13 @@ body::before {
     
     /* 캔버스 오버레이 크기 조정 */
     .game-overlay {
-        width: 456px; /* 오버레이 크기 더 축소 */
-        height: 456px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
     }
     
     .overlay-title {
