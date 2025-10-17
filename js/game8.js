@@ -89,6 +89,7 @@ function setupEventListeners() {
     document.addEventListener('keydown', handleKeyDown);
     setupModalClickEvents();
     setupTouchEvents();
+    setupMouseDragEvents();
     setupMobileControls();
 }
 
@@ -140,7 +141,61 @@ function setupTouchEvents() {
         elements.gameBoard.addEventListener('touchend', handleTouchEnd, {passive: false});
     }
 }
+let mouseStartX = 0;
+let mouseStartY = 0;
+let isMouseDown = false;
 
+function setupMouseDragEvents() {
+    if (elements.gameBoard) {
+        elements.gameBoard.addEventListener('mousedown', handleMouseDown);
+        elements.gameBoard.addEventListener('mousemove', handleMouseMove);
+        elements.gameBoard.addEventListener('mouseup', handleMouseUp);
+        elements.gameBoard.addEventListener('mouseleave', handleMouseLeave);
+    }
+}
+
+function handleMouseDown(e) {
+    if (gameState !== 'playing' || isAnimating) return;
+    isMouseDown = true;
+    mouseStartX = e.clientX;
+    mouseStartY = e.clientY;
+}
+
+function handleMouseMove(e) {
+    // 드래그 중 시각적 피드백 필요하면 여기에 추가
+}
+
+function handleMouseUp(e) {
+    if (!isMouseDown) return;
+    isMouseDown = false;
+    
+    const mouseEndX = e.clientX;
+    const mouseEndY = e.clientY;
+    
+    const deltaX = mouseEndX - mouseStartX;
+    const deltaY = mouseEndY - mouseStartY;
+    const minDragDistance = 50;
+    
+    if (Math.abs(deltaX) > minDragDistance || Math.abs(deltaY) > minDragDistance) {
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            if (deltaX > 0) {
+                handleMove('right');
+            } else {
+                handleMove('left');
+            }
+        } else {
+            if (deltaY > 0) {
+                handleMove('down');
+            } else {
+                handleMove('up');
+            }
+        }
+    }
+}
+
+function handleMouseLeave(e) {
+    isMouseDown = false;
+}
 function setupMobileControls() {
     const mobileButtons = document.querySelectorAll('.mobile-btn');
     mobileButtons.forEach(btn => {
@@ -244,15 +299,15 @@ function showInitialDifficultySelection() {
                     <small>5×5, 목표: 4096</small>
                 </button>
                 <button class="difficulty-btn" onclick="selectDifficulty('6')">
-                    <span>🔴 고급</span><br>
+                    <span>🔴 최고급</span><br>
                     <small>6×6, 목표: 8192</small>
                 </button>
                 <button class="difficulty-btn" onclick="selectDifficulty('7')">
-                    <span>🟣 최고급</span><br>
+                    <span>🟣 극한급</span><br>
                     <small>7×7, 목표: 16384</small>
                 </button>
                 <button class="difficulty-btn" onclick="selectDifficulty('8')">
-                    <span>⚫ 극한</span><br>
+                    <span>⚫ 초월급</span><br>
                     <small>8×8, 목표: 32768</small>
                 </button>
                 <button class="difficulty-btn hex-mode" onclick="selectDifficulty('hex')">
