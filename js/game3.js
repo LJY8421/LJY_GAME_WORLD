@@ -993,6 +993,10 @@ function goHome() {
     }
 }
 
+
+let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
+let isSwiping = false;
+
 // 이벤트 리스너 설정
 function setupEventListeners() {
     document.addEventListener('keydown', handleKeyDown);
@@ -1007,40 +1011,51 @@ function setupEventListeners() {
     setupModalClickEvents();
     
     // 터치 스와이프
-    let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
-    
     if (canvas) {
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             touchStartX = e.changedTouches[0].screenX;
             touchStartY = e.changedTouches[0].screenY;
+            isSwiping = true;
+        }, { passive: false });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isSwiping) return;
+            e.preventDefault();
+            
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
         }, { passive: false });
         
         canvas.addEventListener('touchend', (e) => {
             e.preventDefault();
-            touchEndX = e.changedTouches[0].screenX;
-            touchEndY = e.changedTouches[0].screenY;
-            handleSwipe();
+            if (isSwiping) {
+                handleSwipe();
+                isSwiping = false;
+            }
         }, { passive: false });
     }
+}
+
+function handleSwipe() {
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+    const minSwipeDistance = 30;
     
-    function handleSwipe() {
-        const deltaX = touchEndX - touchStartX;
-        const deltaY = touchEndY - touchStartY;
-        const minSwipeDistance = 30;
-        
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            if (deltaX > minSwipeDistance) {
-                changeDirection('right');
-            } else if (deltaX < -minSwipeDistance) {
-                changeDirection('left');
-            }
+    const isHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
+    const isVertical = Math.abs(deltaY) > Math.abs(deltaX);
+    
+    if (isHorizontal && Math.abs(deltaX) > minSwipeDistance) {
+        if (deltaX > 0) {
+            changeDirection('right');
         } else {
-            if (deltaY > minSwipeDistance) {
-                changeDirection('down');
-            } else if (deltaY < -minSwipeDistance) {
-                changeDirection('up');
-            }
+            changeDirection('left');
+        }
+    } else if (isVertical && Math.abs(deltaY) > minSwipeDistance) {
+        if (deltaY > 0) {
+            changeDirection('down');
+        } else {
+            changeDirection('up');
         }
     }
 }
